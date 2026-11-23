@@ -43,7 +43,9 @@ def test_manifest_meshes():
 
 def test_tibia_tip_at_segment_length():
     manifest = json.loads((CAD / "meshes" / "manifest.json").read_text())
-    tibia = next(p for p in manifest["parts"] if p["segment"] == "tibia" and p["file"].startswith("Tibia"))
+    tibia = next(
+        p for p in manifest["parts"] if p["segment"] == "tibia" and p["file"].startswith("Tibia")
+    )
     v = read_stl(CAD / "meshes" / tibia["file"]).reshape(-1, 3) - np.array(tibia["origin_mm"])
     assert v[:, 0].max() == pytest.approx(CFG.leg.tibia * 1000, abs=0.5)
 
