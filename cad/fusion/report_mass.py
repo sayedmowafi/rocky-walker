@@ -105,8 +105,14 @@ def run(_context: str):
             hits.append([res.entityOne.name, res.entityTwo.name, round(vol, 1)])
     pose_all({"coxa": 0.0, "femur": 0.0, "knee": 0.0})
 
+    mounts = []
+    for occ in legs:
+        t = occ.transform2.translation
+        mounts.append([round(math.hypot(t.x, t.y) * 10, 3), round(math.degrees(math.atan2(t.y, t.x)) % 360, 3),
+                       round(t.z * 10, 3)])
     print(json.dumps({
         "legs": len(legs),
+        "leg_mounts_r_deg_z": sorted(mounts, key=lambda m: m[1]),
         "total_kg": round(total, 4),
         "torso_kg": round(torso_kg, 4),
         "misc_kg": MISC_KG,
