@@ -34,7 +34,7 @@ README.md               what / why / status / photos / fan disclaimer
 LICENSE                 software licence (MIT)
 LICENSE-HARDWARE        hardware licence (CERN-OHL-P v2)
 config/rocky.toml       single source of truth: geometry, servos, gait
-cad/                    build123d parts + export script → STL/STEP   (from M2)
+cad/                    Fusion 360 design (.f3d) + STEP + STL exports  (from M2)
 rocky/                  Python package: kinematics, gait, motion, backends, sim, ...
 tools/                  calibration, servo test, etc.                (from M2)
 tests/

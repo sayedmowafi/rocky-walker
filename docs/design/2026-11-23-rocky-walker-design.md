@@ -27,7 +27,7 @@ There are two reasons for the project:
    - Every printed part fits a **180 × 180 × 180 mm** bed, in PLA.
    - No special tools beyond a soldering iron, screwdrivers and a printer.
    - **Minimum supported controller: Raspberry Pi 5, 4 GB** *(Claude's call)*. Development happens on the owner's 16 GB board, so each process logs its memory use, and all processes running together (motion, vision, web with camera stream, voice) must stay under about 3 GB. That way the 4 GB claim can be checked without owning a 4 GB board.
-3. **Editable, not just reprintable.** The CAD is parametric code (build123d). One config file drives the CAD, the simulation and the kinematics.
+3. **Editable, not just reprintable.** The CAD is a parametric Fusion 360 design whose key dimensions live in Fusion user parameters that mirror `config/rocky.toml`. The `.f3d`, STEP and STL exports are all published.
 4. **Phone remote control:** a joystick for walking, buttons for poses and dance moves, mode switching and an e-stop. No app install is needed. It runs in the phone browser.
 5. **Camera follow mode:** select a target and Rocky follows it. This is built as an extensible vision platform, so more vision behaviours can be added later.
 6. **Voice:** a microphone and speaker so Rocky can "speak". Chord-like tones are the intended nod to the book.
@@ -64,14 +64,14 @@ There are two reasons for the project:
 
 **Why A:** it is the cheapest and simplest to rebuild, and the PCA9685 already removes the main reason for a microcontroller (pulse jitter). The owner has many spare ESP32s. If motion timing on the Pi ever proves insufficient, the motion process can move to an ESP32 behind the same command interface. That is the fallback, not the plan.
 
-### 5.2 CAD tool (owner picked **build123d**)
+### 5.2 CAD tool (owner picked **Fusion 360**, revised 2026-11-23)
 
 | | Approach | Trade-off |
 |---|---|---|
-| **build123d** ✅ | Code CAD in Python, parts in the repo, driven by the shared config. | Parametric across five identical legs and interdependent dimensions. Readable git diffs. Rebuilders can change servo or leg sizes and regenerate everything. Claude can author and modify parts directly. Cost: a learning curve (the owner has used Tinkercad only), and organic shapes are harder. |
-| Fusion 360 | Visual parametric CAD with STEP and STL exports. | Easier for sculpted shapes. The source files are proprietary, so rebuilders can't easily edit them and git can't show changes. |
+| build123d | Code CAD in Python, parts in the repo, driven by the shared config. | Parametric across five identical legs and interdependent dimensions. Readable git diffs. Rebuilders can change servo or leg sizes and regenerate everything. Claude can author and modify parts directly. Cost: a learning curve (the owner has used Tinkercad only), and organic shapes are harder. |
+| **Fusion 360** ✅ | Visual parametric CAD with STEP and STL exports, driven through the Fusion MCP connection. | Precise, visual, and the owner's preferred central design. Claude builds it by script through the Fusion MCP, and the owner can see and edit it live. The source files are proprietary, so STEP is published alongside the `.f3d` for rebuilders using other CAD tools. |
 
-**Decision:** everything is in build123d. The carapace uses a **faceted, low-poly, rock-like** style that suits Rocky and generates easily in code. A hand-sculpted cosmetic cover could be made in Fusion later. It carries no load, so it may be the one non-parametric part.
+**Decision (revised):** the owner first picked build123d on Claude's recommendation, then reversed it before any CAD existed. The central design is **Fusion 360**, with key dimensions as Fusion user parameters mirroring `config/rocky.toml`. **Blender** is used to showcase the assembled robot walking and dancing, animated by the real motion code (see `docs/design/2026-11-23-m2-fusion-blender-design.md`). The faceted, rock-like carapace style still stands.
 
 ### 5.3 Servo choice (owner's choice)
 
@@ -309,7 +309,7 @@ README.md               what / why / status / photos / fan disclaimer
 LICENSE                 software licence
 LICENSE-HARDWARE        hardware licence (CAD + docs)
 config/rocky.toml       single source of truth
-cad/                    build123d parts + export script → STL/STEP
+cad/                    Fusion design (.f3d) + STEP + STL exports
 rocky/                  Python package
   kinematics/  gait/  motion/  backends/  control/  vision/  voice/  moves/
 sim/                    MJCF generation + sim scripts
@@ -322,7 +322,7 @@ docs/
   bom.md                parts list with links and prices
 ```
 
-Generated STLs are attached to **GitHub releases**, not committed, so the repo stays light (builder's call). Tooling (uv/pip, ruff, pytest, CI on GitHub Actions running tests and CAD export) is the builder's call.
+CAD files (`.f3d`, STEP, STLs) are committed in `cad/`: with Fusion they can't be regenerated from code (revised 2026-11-23, see the M2 design). Rendered videos go on **GitHub releases**. Tooling (uv/pip, ruff, pytest, CI on GitHub Actions running tests and CAD export) is the builder's call.
 
 ## 11. Licensing and the fan-project question
 
@@ -338,7 +338,7 @@ Generated STLs are attached to **GitHub releases**, not committed, so the repo s
 - Cheap enough for others to rebuild.
 - Features: walking, phone remote with dance moves, extensible camera follow mode, mic + speaker voice.
 - Architecture A (Pi 5 + PCA9685, Python).
-- CAD in build123d.
+- CAD in Fusion 360 (revised from build123d before any CAD existed); Blender for the walking/dancing showcase.
 - Spare ESP32s are available for later use if needed.
 - When constraints collide: shrink before upgrading (§6.3). "Smooth" allows a slight buzz at rest (§4).
 - Licences: MIT (software) + CERN-OHL-P v2 (hardware).
