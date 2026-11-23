@@ -100,6 +100,8 @@ There are two reasons for the project:
 | Printed parts, bearings, screws | 0.5–0.7 kg |
 | **Total** | **about 1.8–2.1 kg** |
 
+**Measured from the M2 Fusion design:** 1.694 kg total (printed parts at 0.6 × solid PLA, a 98 g 2S 2200 mAh shorty pack, and a 60 g allowance for screws and wires). See `cad/reports/mass.json` and `cad/reports/changes.md`.
+
 That puts the robot at about **35–45 cm across** with the legs in a standing pose.
 
 ### 6.3 Leg lengths and the torque rule

@@ -235,16 +235,18 @@ def run(_context: str):
     tbm.booleanOperation(camera, cyl(cam_c, lens_p1, 4), UNION)
 
     # ---------- battery tray (under the bottom plate, long axis between legs 0 and 1) ----------
-    bat_l, bat_w, bat_h = 106.0, 34.0, 18.0
+    # Zeee 2S 2200 mAh 50C shorty, XT60 (73 x 34 x 18.5 mm, 98 g); tray leaves C all round
+    bat_l, bat_w, bat_h = 73.0, 34.0, 18.5
     bat_dir = (math.cos(cam_a), math.sin(cam_a), 0)
     bat_side = (-math.sin(cam_a), math.cos(cam_a), 0)
     bat_top = bot_z0 - 1.0
     battery = obox((0, 0, bat_top - bat_h / 2), bat_dir, bat_side, bat_l, bat_w, bat_h)
-    tray_floor = obox((0, 0, bat_top - bat_h - 1.5), bat_dir, bat_side, bat_l * 0.7, bat_w + 6, 3)
+    floor_top = bat_top - bat_h - C
+    tray_floor = obox((0, 0, floor_top - 1.5), bat_dir, bat_side, bat_l * 0.85, bat_w + 6, 3)
     # tray hangs from the bottom plate on two walls along the battery's long sides
     walls = [
-        obox(tuple(bat_side[i] * s * (bat_w / 2 + 1.5 + C) for i in range(2)) + ((bot_z0 + bat_top - bat_h - 3) / 2,),
-             bat_dir, bat_side, bat_l * 0.7, 3, bot_z0 - (bat_top - bat_h - 3))
+        obox(tuple(bat_side[i] * s * (bat_w / 2 + 1.5 + C) for i in range(2)) + ((bot_z0 + floor_top - 3) / 2,),
+             bat_dir, bat_side, bat_l * 0.85, 3, bot_z0 - (floor_top - 3))
         for s in (-1, 1)
     ]
     tray = uni(tray_floor, *walls)

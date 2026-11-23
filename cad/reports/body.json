@@ -6,11 +6,11 @@
   "printed": {
     "BatteryTray": {
       "bbox_mm": [
-        83.89,
-        76.46,
-        22.0
+        74.06,
+        69.32,
+        22.8
       ],
-      "volume_mm3": 17496.4
+      "volume_mm3": 14929.2
     },
     "Carapace": {
       "bbox_mm": [

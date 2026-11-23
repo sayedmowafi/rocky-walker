@@ -8,7 +8,7 @@ mount_radius_mm = 70    # body centre -> coxa axis (frozen M1)
 thickness_mm = 32      # M2: chassis plate-to-plate height from the Fusion body (was 40)
 
 [mass]                  # M2: measured from the Fusion design (cad/reports/mass.json)
-total_kg = 1.718        # was 2.0 (estimate); incl. 60 g screws/wires allowance
+total_kg = 1.694        # was 2.0 (estimate); incl. 60 g screws/wires allowance, 98 g 2S 2200 shorty
 coxa_link_kg = 0.0852   # coxa bracket + femur servo + horn + bearing
 femur_link_kg = 0.0876  # femur + knee servo + horn + bearing
 tibia_link_kg = 0.0322  # tibia + horn + bearing

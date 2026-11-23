@@ -14,7 +14,7 @@ MISC_KG = 0.060  # screws, nuts, wires, straps (not modelled)
 BOUGHT_KG = {
     "BOUGHT_MG996R": 0.055, "BOUGHT_horn": 0.006, "BOUGHT_bearing": 0.002,
     "BOUGHT_pi5": 0.046, "BOUGHT_pca9685": 0.009, "BOUGHT_ubec": 0.025,
-    "BOUGHT_buck": 0.015, "BOUGHT_lipo": 0.120, "BOUGHT_camera": 0.004,
+    "BOUGHT_buck": 0.015, "BOUGHT_lipo": 0.098, "BOUGHT_camera": 0.004,
 }
 STANCE_MM = {{gait.stance_radius_mm}}
 MOUNT_MM = {{body.mount_radius_mm}}

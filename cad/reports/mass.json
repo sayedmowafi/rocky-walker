@@ -42,11 +42,11 @@
     "BOUGHT_horn_coxa": 0.006,
     "BOUGHT_horn_femur": 0.006,
     "BOUGHT_horn_knee": 0.006,
-    "BOUGHT_lipo": 0.12,
+    "BOUGHT_lipo": 0.098,
     "BOUGHT_pca9685": 0.009,
     "BOUGHT_pi5": 0.046,
     "BOUGHT_ubec": 0.025,
-    "BatteryTray": 0.013,
+    "BatteryTray": 0.0111,
     "Carapace": 0.0307,
     "ChassisBottom": 0.0406,
     "ChassisTop": 0.0253,
@@ -81,6 +81,6 @@
       "kg": 0.0322
     }
   },
-  "torso_kg": 0.6926,
-  "total_kg": 1.7176
+  "torso_kg": 0.6687,
+  "total_kg": 1.6937
 }
