@@ -2,13 +2,15 @@
 
 An open-source, five-legged walking robot inspired by Rocky from *Project Hail Mary*.
 
-Rocky Walker has five legs spread evenly around a round, rock-like carapace, and **no front**. It's meant to walk in any direction and turn in place, like the character. The brain is a Raspberry Pi 5 driving 15 cheap MG996R servos through a PCA9685 board. Every structural part is 3D printed in PLA and fits a 180 × 180 mm print bed. The goal is a robot that other people can actually afford to rebuild: about $200 in parts, not counting the Pi.
+Rocky Walker has five legs spread evenly around a round, rock-like carapace, and **no front**. It's meant to walk in any direction and turn in place, like the character. The brain is a Raspberry Pi 5 driving 15 cheap MG996R servos through a PCA9685 board. Every structural part is 3D printed (PLA or PETG) and fits a 180 × 180 mm print bed. The goal is a robot that other people can actually afford to rebuild: about **US $290** for everything, including a spare battery, the charger and the voice hardware, but not the Pi and camera. See the [component list](docs/bom.md).
 
 ## Status
 
 **M2 done: Rocky has a real, printable design (Fusion 360) and walks and dances in Blender, driven by the real motion code.** See [build log #2](docs/build-log/2026-11-23-02-fusion-and-blender.md).
 
-![Rocky in Blender](docs/build-log/media/02-hero.png)
+![Render of Rocky in Blender (not a photo)](docs/build-log/media/02-hero.png)
+
+*Render, not a photo: see the preview section below.*
 
 Next up is the **bench leg**: one printed leg on real servos. Follow along in the [build log](docs/build-log/).
 
@@ -23,6 +25,18 @@ Next up is the **bench leg**: one printed leg on real servos. Follow along in th
 | M5 | Phone control + dances | — |
 | M6 | Camera follow mode | — |
 | M7 | Voice (Rocky speaks in chords) | — |
+
+## What Rocky should be able to do (preview)
+
+> ⚠️ **These are not real videos of the robot.** They're computer renders made in Blender from the Fusion 360 design. They show what Rocky is being built to do. The motion is real code, though: every frame comes from the same walking and dance software that will drive the physical servos, not from hand animation. Real footage will replace these once the hardware walks.
+
+| Walk forward | Walk diagonally (no front!) |
+|---|---|
+| ![Render: Rocky walking forward](docs/build-log/media/02-walk-forward.gif) | ![Render: Rocky walking diagonally](docs/build-log/media/02-walk-diagonal.gif) |
+| **Turn in place** | **Dance routine** |
+| ![Render: Rocky turning in place](docs/build-log/media/02-turn.gif) | ![Render: Rocky dancing](docs/build-log/media/02-dance.gif) |
+
+Full-length render videos (MP4) are on the [M2 release](https://github.com/sayedmowafi/rocky-walker/releases/tag/m2).
 
 ## Why
 
