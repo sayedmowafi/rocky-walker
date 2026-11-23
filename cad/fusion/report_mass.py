@@ -21,6 +21,19 @@ MOUNT_MM = {{body.mount_radius_mm}}
 HEIGHT_MM = {{gait.body_height_mm}}
 
 
+def params_snapshot(design):
+    """All user parameters at report time (mm / deg), so a stale report can be detected."""
+    out = {}
+    for p in design.userParameters:
+        if p.unit == "mm":
+            out[p.name] = round(p.value * 10, 9)
+        elif p.unit == "deg":
+            out[p.name] = round(math.degrees(p.value), 9)
+        else:
+            out[p.name] = p.value
+    return out
+
+
 def run(_context: str):
     design = adsk.fusion.Design.cast(adsk.core.Application.get().activeProduct)
     root = design.rootComponent
@@ -112,6 +125,7 @@ def run(_context: str):
                        round(t.z * 10, 3)])
     print(json.dumps({
         "legs": len(legs),
+        "params_snapshot": params_snapshot(design),
         "leg_mounts_r_deg_z": sorted(mounts, key=lambda m: m[1]),
         "total_kg": round(total, 4),
         "torso_kg": round(torso_kg, 4),

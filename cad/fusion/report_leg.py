@@ -14,6 +14,19 @@ HEIGHT_MM = {{gait.body_height_mm}}
 MIN_VOL_MM3 = 1.0
 
 
+def params_snapshot(design):
+    """All user parameters at report time (mm / deg), so a stale report can be detected."""
+    out = {}
+    for p in design.userParameters:
+        if p.unit == "mm":
+            out[p.name] = round(p.value * 10, 9)
+        elif p.unit == "deg":
+            out[p.name] = round(math.degrees(p.value), 9)
+        else:
+            out[p.name] = p.value
+    return out
+
+
 def run(_context: str):
     design = adsk.fusion.Design.cast(adsk.core.Application.get().activeProduct)
     root = design.rootComponent
@@ -112,5 +125,19 @@ def run(_context: str):
             printed[b.name] = {"bbox_mm": [round(d, 2) for d in dims],
                                "volume_mm3": round(b.volume * 1000, 1)}
     report["printed"] = printed
-    report["joint_origins_mm"] = {"coxa": 0.0, "femur": round(LC, 4), "knee": round(LC + LF, 4)}
+    # read the real Fusion joints (geometry origin in the Leg frame, rotation limits in code sign)
+    jr = {}
+    for name, j in joints.items():
+        o = j.geometry.origin.copy()
+        to_leg = leg_occ.transform2.copy()  # joint geometry is reported in world coordinates
+        to_leg.invert()
+        o.transformBy(to_leg)
+        lim = j.jointMotion.rotationLimits
+        lo, hi = math.degrees(lim.minimumValue), math.degrees(lim.maximumValue)
+        if flip[name] < 0:
+            lo, hi = -hi, -lo
+        jr[name] = {"origin_mm": [round(o.x * 10, 6), round(o.y * 10, 6), round(o.z * 10, 6)],
+                    "limits_deg": [round(lo, 6), round(hi, 6)]}
+    report["joints"] = jr
+    report["params_snapshot"] = params_snapshot(design)
     print(json.dumps(report, indent=2, sort_keys=True))

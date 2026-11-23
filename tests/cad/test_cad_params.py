@@ -21,7 +21,7 @@ def toml():
         return tomllib.load(f)
 
 
-def _mirrored(toml):
+def mirrored(toml):
     out = {
         "coxa_mm": toml["leg"]["coxa_mm"],
         "femur_mm": toml["leg"]["femur_mm"],
@@ -36,11 +36,13 @@ def _mirrored(toml):
 
 
 def test_params_match_config(report, toml):
-    bad = [
-        f"{k}: fusion={report['params'].get(k)} toml={v}"
-        for k, v in _mirrored(toml).items()
-        if report["params"].get(k) is None or abs(report["params"][k] - v) > 1e-6
-    ]
+    bad = []
+    for k, v in mirrored(toml).items():
+        got = report["params"].get(k)
+        if got is None:
+            bad.append(f"{k}: missing in Fusion (toml={v})")
+        elif abs(got - v) > 1e-6:
+            bad.append(f"{k}: fusion={got} toml={v} (differs by {got - v:+g})")
     assert not bad, "Fusion parameters differ from config/rocky.toml:\n" + "\n".join(bad)
 
 

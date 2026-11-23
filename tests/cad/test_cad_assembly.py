@@ -1,9 +1,11 @@
 import json
+import tomllib
 from pathlib import Path
 
 import pytest
+from test_cad_params import mirrored
 
-from rocky.config import load_config
+from rocky.config import DEFAULT_CONFIG_PATH, load_config
 
 REPORTS = Path(__file__).resolve().parents[2] / "cad" / "reports"
 CFG = load_config()
@@ -27,6 +29,14 @@ def test_legs_on_their_mounts(mass):
         assert r == pytest.approx(CFG.body.mount_radius * 1000, abs=0.01)
         assert deg == pytest.approx(72 * k, abs=0.01)
         assert z == pytest.approx(0, abs=0.01)
+
+
+def test_mass_report_built_from_current_config(mass):
+    with open(DEFAULT_CONFIG_PATH, "rb") as f:
+        toml = tomllib.load(f)
+    for key, value in mirrored(toml).items():
+        snap = mass["params_snapshot"][key]
+        assert snap == pytest.approx(value, abs=1e-6), f"mass.json is stale: {key}"
 
 
 def test_config_masses_match_cad(mass):

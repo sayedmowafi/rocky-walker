@@ -78,3 +78,46 @@ def test_load_rejects_bad_times(tmp_path):
     f.write_text('name = "bad"\n[[key]]\nt = 0.0\n[[key]]\nt = 0.0\n')
     with pytest.raises(ConfigError, match="increasing"):
         load_move(f)
+
+
+def _write(tmp_path, name, body):
+    (tmp_path / f"{name}.toml").write_text(f'name = "{name}"\n' + body)
+    return tmp_path / f"{name}.toml"
+
+
+def test_routine_rejects_non_neutral_parts(tmp_path):
+    _write(tmp_path, "a", "[[key]]\nt = 0.0\n[[key]]\nt = 1.0\nz_mm = 12\n")
+    _write(tmp_path, "b", "[[key]]\nt = 0.0\nx_mm = 15\n[[key]]\nt = 1.0\n")
+    routine = tmp_path / "r.toml"
+    routine.write_text('name = "r"\nsequence = ["a", "b"]\n')
+    with pytest.raises(ConfigError, match="part a"):
+        load_move(routine)
+
+
+def test_rejects_planted_foot_pushed_into_floor():
+    sunk = {0: np.array([0.0, 0.0, -0.005])}
+    move = Move("sink", (neutral_key(0.0), Keyframe(1.0, NEUTRAL, sunk), neutral_key(2.0)))
+    with pytest.raises(ConfigError, match=r"sink at t=.*into the floor"):
+        MovePlayer(CFG).validate(move)
+
+
+def test_rejects_planted_foot_sliding():
+    slid = {0: np.array([0.02, 0.0, 0.0])}
+    move = Move("slide", (neutral_key(0.0), Keyframe(1.0, NEUTRAL, slid), neutral_key(2.0)))
+    with pytest.raises(ConfigError, match=r"slide at t=.*slides"):
+        MovePlayer(CFG).validate(move)
+
+
+def test_play_validates_first():
+    up = {leg: np.array([0.0, 0.0, 0.03]) for leg in (0, 1, 2)}
+    move = Move("bad", (neutral_key(0.0), Keyframe(1.0, NEUTRAL, up), neutral_key(2.0)))
+    with pytest.raises(ConfigError, match="support"):
+        next(MovePlayer(CFG).play(move, 0.01))
+
+
+def test_play_refuses_start_away_from_neutral():
+    move = load_move(MOVES / "bob.toml")
+    player = MovePlayer(CFG)
+    start = player.angles(NEUTRAL, {}) + np.radians(10)
+    with pytest.raises(ConfigError, match="neutral"):
+        next(player.play(move, 0.01, start=start))

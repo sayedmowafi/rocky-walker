@@ -79,9 +79,21 @@ class MovePlayer:
             raise ConfigError(f"{move.name}: must start and end at the neutral pose")
         max_step = self._cfg.servo.max_speed * dt
         prev = None
+        prev_feet: dict[int, np.ndarray] = {}
         for k in range(round(move.duration / dt) + 1):
             t = k * dt
             pose, feet = self.sample(move, t)
+            for leg in range(5):
+                off = feet.get(leg, np.zeros(3))
+                if off[2] < -1e-9:
+                    raise ConfigError(f"{move.name} at t={t:.2f}s: leg {leg} pushed into the floor")
+                before = prev_feet.get(leg, np.zeros(3))
+                planted_both = off[2] <= LIFT_EPS and before[2] <= LIFT_EPS
+                if k > 0 and planted_both and np.linalg.norm(off[:2] - before[:2]) > 1e-9:
+                    raise ConfigError(
+                        f"{move.name} at t={t:.2f}s: planted leg {leg} slides along the floor"
+                    )
+            prev_feet = feet
             try:
                 a = self.angles(pose, feet)
             except UnreachableError as e:
@@ -100,9 +112,20 @@ class MovePlayer:
                     f"support polygon (need {STABILITY_MARGIN * 1000:.0f} mm)"
                 )
 
-    def play(self, move: Move, dt: float) -> Iterator[tuple[float, BodyPose, np.ndarray]]:
-        """Yield (t, pose, guarded joint angles) every dt, starting from the neutral stance."""
+    def play(
+        self, move: Move, dt: float, start: np.ndarray | None = None
+    ) -> Iterator[tuple[float, BodyPose, np.ndarray]]:
+        """Validate the move, then yield (t, pose, guarded joint angles) every dt.
+
+        ``start`` is where the servos actually are (default: the neutral stance). Moves begin
+        at the neutral stance, so a start more than 1 degree away from it is refused rather
+        than jumped from."""
+        self.validate(move, dt)
         current = self.angles(BodyPose(), {})
+        if start is not None:
+            if np.abs(np.asarray(start) - current).max() > np.radians(1.0):
+                raise ConfigError(f"{move.name}: robot must be at the neutral stance to start")
+            current = np.array(start, dtype=float)
         max_step = self._cfg.servo.max_speed * dt
         for k in range(round(move.duration / dt) + 1):
             t = k * dt

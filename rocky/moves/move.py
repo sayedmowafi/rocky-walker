@@ -69,6 +69,8 @@ def load_move(path: Path | str) -> Move:
         offset = 0.0
         for part in raw["sequence"]:
             move = load_move(path.parent / f"{part}.toml")
+            if not (move.keyframes[0].is_neutral() and move.keyframes[-1].is_neutral()):
+                raise ConfigError(f"{name}: part {part} must start and end at the neutral pose")
             for i, k in enumerate(move.keyframes):
                 if keys and i == 0:
                     continue  # previous move already ends at this (neutral) instant
