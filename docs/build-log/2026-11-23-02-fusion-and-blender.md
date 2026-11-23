@@ -60,6 +60,8 @@ Walking never used the range I removed. The full-speed walking-envelope check an
 
 **This isn't hand animation.** Each frame comes from running the real `MotionController` (walking) or the new move player (dancing). It produces 15 joint angles plus where the body is, and a Blender script keyframes the Fusion meshes with those values. A test checks that a foot on the floor never slides more than 1 mm between frames. It's 0.4 mm walking and 0 mm dancing.
 
+*(These clips were rendered just before I resized the battery tray for the real pack, so the battery under the body is the older, longer placeholder. The CAD and meshes in the repo have the final 73 mm pack.)*
+
 **The dance** is five moves chained into a 21-second routine: sway, bob, twist, tilt-circle and a leg wave. Moves are plain [TOML files](../../moves/), so anyone can write one. Before the robot will play a move, it has to pass four checks:
 1. **Reach:** every foot position is reachable.
 2. **Limits:** every joint stays inside its physical limits.
