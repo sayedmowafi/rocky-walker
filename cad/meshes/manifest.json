@@ -1,0 +1,235 @@
+{
+  "units": "mm",
+  "parts": [
+    {
+      "file": "CoxaServo__BOUGHT_MG996R_coxa.stl",
+      "segment": "leg_static",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Coxa__Coxa.stl",
+      "segment": "coxa",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "black"
+    },
+    {
+      "file": "Coxa__BOUGHT_MG996R_femur.stl",
+      "segment": "coxa",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Coxa__BOUGHT_horn_coxa.stl",
+      "segment": "coxa",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "silver"
+    },
+    {
+      "file": "Coxa__BOUGHT_bearing_coxa.stl",
+      "segment": "coxa",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "silver"
+    },
+    {
+      "file": "Femur__Femur.stl",
+      "segment": "femur",
+      "origin_mm": [
+        40.0,
+        0,
+        0
+      ],
+      "color": "blue"
+    },
+    {
+      "file": "Femur__BOUGHT_MG996R_knee.stl",
+      "segment": "femur",
+      "origin_mm": [
+        40.0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Femur__BOUGHT_horn_femur.stl",
+      "segment": "femur",
+      "origin_mm": [
+        40.0,
+        0,
+        0
+      ],
+      "color": "silver"
+    },
+    {
+      "file": "Femur__BOUGHT_bearing_femur.stl",
+      "segment": "femur",
+      "origin_mm": [
+        40.0,
+        0,
+        0
+      ],
+      "color": "silver"
+    },
+    {
+      "file": "Tibia__Tibia.stl",
+      "segment": "tibia",
+      "origin_mm": [
+        110.0,
+        0,
+        0
+      ],
+      "color": "blue"
+    },
+    {
+      "file": "Tibia__BOUGHT_horn_knee.stl",
+      "segment": "tibia",
+      "origin_mm": [
+        110.0,
+        0,
+        0
+      ],
+      "color": "silver"
+    },
+    {
+      "file": "Tibia__BOUGHT_bearing_knee.stl",
+      "segment": "tibia",
+      "origin_mm": [
+        110.0,
+        0,
+        0
+      ],
+      "color": "silver"
+    },
+    {
+      "file": "Chassis__ChassisTop.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "black"
+    },
+    {
+      "file": "Chassis__ChassisBottom.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "black"
+    },
+    {
+      "file": "Chassis__BatteryTray.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "black"
+    },
+    {
+      "file": "Deck__Deck.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "black"
+    },
+    {
+      "file": "Carapace__Carapace.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "white"
+    },
+    {
+      "file": "Electronics__BOUGHT_pi5.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_pca9685.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_ubec.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_buck.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_lipo.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_camera.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    }
+  ]
+}

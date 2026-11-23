@@ -16,3 +16,8 @@ out/
 
 # Build-log media is the showcase: keep these GIFs in the repo.
 !docs/build-log/media/*.gif
+
+# CAD exports are the hardware deliverable (Fusion can't regenerate them from code)
+!cad/stl/*.stl
+!cad/meshes/*.stl
+!cad/rocky.step
