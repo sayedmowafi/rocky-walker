@@ -25,7 +25,11 @@ packages = ["rocky"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["sim: runs the MuJoCo simulation (slower)"]
+markers = [
+    "sim: runs the MuJoCo simulation (slower)",
+    "fusion: needs a running Fusion 360 with the MCP add-in",
+    "blender: needs the Blender app",
+]
 
 [tool.ruff]
 line-length = 100
