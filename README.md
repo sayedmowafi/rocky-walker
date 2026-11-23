@@ -51,7 +51,7 @@ The project needs [uv](https://docs.astral.sh/uv/).
 
 ```bash
 uv sync
-uv run pytest                                              # 51 tests, including MuJoCo walking
+uv run pytest                                              # 70 tests, including MuJoCo walking
 uv run python -m rocky.sim walk --vx 0.03 --vy 0.02        # walk and print a report
 uv run python -m rocky.sim torque --gait star              # torque budget check
 uv sync --extra video && uv run python -m rocky.sim walk --wz 0.25 --video out/turn.mp4
