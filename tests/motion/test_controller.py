@@ -7,6 +7,7 @@ import pytest
 
 from rocky.commands import BodyVelocity
 from rocky.config import DEFAULT_CONFIG_PATH, ConfigError, load_config, parse_config
+from rocky.kinematics.leg import leg_ik
 from rocky.motion.controller import MotionController
 
 CFG = load_config()
@@ -19,7 +20,10 @@ def ticks(ctl, target, seconds):
 
 def test_starts_in_neutral_stance():
     ctl = MotionController(CFG)
-    expected = np.tile([0.0, 0.0, -np.pi / 2], (5, 1))
+    reach = CFG.gait.stance_radius - CFG.body.mount_radius
+    leg = leg_ik(np.array([reach, 0.0, -CFG.gait.body_height]), CFG.leg)
+    assert leg[0] == 0.0
+    expected = np.tile(leg, (5, 1))
     np.testing.assert_allclose(ctl.angles, expected, atol=1e-9)
 
 

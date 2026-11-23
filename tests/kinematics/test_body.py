@@ -27,7 +27,9 @@ def test_neutral_foot_in_leg_frame():
     feet = neutral_feet(CFG)
     assert feet.shape == (5, 3)
     for m in leg_mounts(CFG.body):
-        np.testing.assert_allclose(body_to_leg(feet[m.index], m), [0.11, 0.0, -0.10], atol=1e-12)
+        reach = CFG.gait.stance_radius - CFG.body.mount_radius
+        expected = [reach, 0.0, -CFG.gait.body_height]
+        np.testing.assert_allclose(body_to_leg(feet[m.index], m), expected, atol=1e-12)
 
 
 def test_radial_symmetry():

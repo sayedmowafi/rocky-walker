@@ -104,7 +104,7 @@ That puts the robot at about **35–45 cm across** with the legs in a standing p
 
 ### 6.3 Leg lengths and the torque rule
 
-Starting values (provisional, to be tuned in simulation):
+**Frozen values (M1).** See [build log #1](../build-log/2026-11-23-01-walking-in-sim.md). Leg lengths are unchanged from the starting values. Stance radius moved from 180 to **165 mm** to give torque margin: both gaits stay within the rule up to 2.4 kg in simulation.
 
 | Segment | Length |
 |---|---|

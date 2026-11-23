@@ -98,7 +98,8 @@ def build_mjcf(cfg: RobotConfig) -> str:
           conaffinity="2" friction="{FRICTION}"/>
     <body name="torso" pos="0 0 {_f(z0)}">
       <freejoint name="root"/>
-      <camera name="track" mode="trackcom" pos="0.7 -0.7 0.55" xyaxes="0.707 0.707 0 -0.3 0.3 0.9"/>
+      <camera name="track" mode="trackcom" pos="0.42 -0.42 0.32"
+              xyaxes="0.707 0.707 0 -0.33 0.33 0.88"/>
       <geom name="torso" type="cylinder" size="{_f(cfg.body.mount_radius, cfg.body.thickness / 2)}"
             mass="{_f(torso_mass)}" contype="2" conaffinity="0" rgba="0.55 0.5 0.45 1"/>{legs_xml}
     </body>

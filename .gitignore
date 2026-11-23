@@ -13,3 +13,6 @@ out/
 *.step
 .DS_Store
 .superpowers/
+
+# Build-log media is the showcase: keep these GIFs in the repo.
+!docs/build-log/media/*.gif

@@ -4,7 +4,7 @@
 
 [body]
 n_legs = 5              # only 5 is supported
-mount_radius_mm = 70    # body centre -> coxa axis (provisional)
+mount_radius_mm = 70    # body centre -> coxa axis (frozen M1)
 thickness_mm = 40
 
 [mass]
@@ -13,7 +13,7 @@ coxa_link_kg = 0.08     # femur servo + bracket
 femur_link_kg = 0.09    # tibia servo + femur
 tibia_link_kg = 0.04
 
-[leg]                   # provisional, frozen at M1
+[leg]                   # frozen at M1 (sim torque log, build log 01)
 coxa_mm = 40
 femur_mm = 70
 tibia_mm = 100
@@ -32,7 +32,7 @@ torque_rule_kgcm = 5.0  # sustained-torque budget per joint (design doc §6.3)
 default = "wave"
 period_s = 1.5
 body_height_mm = 100
-stance_radius_mm = 180
+stance_radius_mm = 165   # frozen M1: 180 -> 165 for torque margin (both gaits OK to 2.4 kg)
 step_height_mm = 30
 max_stride_mm = 60
 

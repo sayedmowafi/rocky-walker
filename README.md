@@ -6,15 +6,17 @@ Rocky Walker has five legs spread evenly around a round, rock-like carapace, and
 
 ## Status
 
-**M0: repo skeleton. Nothing walks yet.**
+**M1 done: Rocky walks in simulation.** It walks in any direction and turns in place on 15 simulated MG996R servos, within the torque budget. See [build log #1](docs/build-log/2026-11-23-01-walking-in-sim.md).
 
-Next up is **M1**: leg kinematics, gait and a MuJoCo simulation that uses the sim's torque log to confirm the leg lengths before anything gets printed. Follow along in the [build log](docs/build-log/).
+![Rocky walking diagonally in MuJoCo](docs/build-log/media/01-walk-diagonal.gif)
+
+Next up is **M2**: one real leg on the bench. Follow along in the [build log](docs/build-log/).
 
 | Milestone | What | State |
 |---|---|---|
 | M0 | Repo skeleton | ✅ |
-| M1 | Kinematics + simulated walking | 🚧 |
-| M2 | One leg on the bench | — |
+| M1 | Kinematics + simulated walking | ✅ |
+| M2 | One leg on the bench | 🚧 |
 | M3 | Stand up | — |
 | M4 | Walk | — |
 | M5 | Phone control + dances | — |
@@ -49,7 +51,11 @@ The project needs [uv](https://docs.astral.sh/uv/).
 
 ```bash
 uv sync
-uv run pytest
+uv run pytest                                              # 51 tests, including MuJoCo walking
+uv run python -m rocky.sim walk --vx 0.03 --vy 0.02        # walk and print a report
+uv run python -m rocky.sim torque --gait star              # torque budget check
+uv sync --extra video && uv run python -m rocky.sim walk --wz 0.25 --video out/turn.mp4
+uv run mjpython -m rocky.sim walk --vx 0.03 --viewer       # interactive 3D viewer (macOS)
 ```
 
 ## Licences
