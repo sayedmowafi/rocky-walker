@@ -5,7 +5,7 @@
 [body]
 n_legs = 5              # only 5 is supported
 mount_radius_mm = 70    # body centre -> coxa axis (frozen M1)
-thickness_mm = 40
+thickness_mm = 32      # M2: chassis plate-to-plate height from the Fusion body (was 40)
 
 [mass]
 total_kg = 2.0

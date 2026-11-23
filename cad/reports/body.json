@@ -1,0 +1,48 @@
+{
+  "chassis_height_mm": 32.3,
+  "coxa_axis_radius_mm": 70.0,
+  "coxa_sweep": {},
+  "interference_neutral": [],
+  "printed": {
+    "BatteryTray": {
+      "bbox_mm": [
+        83.89,
+        76.46,
+        22.0
+      ],
+      "volume_mm3": 17496.4
+    },
+    "Carapace": {
+      "bbox_mm": [
+        118.41,
+        120.8,
+        42.0
+      ],
+      "volume_mm3": 41307.7
+    },
+    "ChassisBottom": {
+      "bbox_mm": [
+        170.63,
+        177.15,
+        29.3
+      ],
+      "volume_mm3": 54524.8
+    },
+    "ChassisTop": {
+      "bbox_mm": [
+        170.63,
+        177.15,
+        3.0
+      ],
+      "volume_mm3": 33997.6
+    },
+    "Deck": {
+      "bbox_mm": [
+        117.62,
+        112.0,
+        54.9
+      ],
+      "volume_mm3": 39005.6
+    }
+  }
+}
