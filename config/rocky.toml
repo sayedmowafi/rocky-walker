@@ -1,0 +1,46 @@
+# Rocky Walker: single source of truth for geometry, servos and gait.
+# Human units here (mm, degrees, kg, kg·cm, deg/s); rocky.config converts everything to SI.
+# Values marked "provisional" are tuned in simulation (milestone M1) before printing.
+
+[body]
+n_legs = 5              # only 5 is supported
+mount_radius_mm = 70    # body centre -> coxa axis (provisional)
+thickness_mm = 40
+
+[mass]
+total_kg = 2.0
+coxa_link_kg = 0.08     # femur servo + bracket
+femur_link_kg = 0.09    # tibia servo + femur
+tibia_link_kg = 0.04
+
+[leg]                   # provisional, frozen at M1
+coxa_mm = 40
+femur_mm = 70
+tibia_mm = 100
+
+[limits]
+coxa_deg = [-45, 45]
+femur_deg = [-60, 90]
+tibia_deg = [-150, -20]
+
+[servo]                 # MG996R at 6 V
+stall_torque_kgcm = 11.0
+max_speed_dps = 400
+torque_rule_kgcm = 5.0  # sustained-torque budget per joint (design doc §6.3)
+
+[gait]
+default = "wave"
+period_s = 1.5
+body_height_mm = 100
+stance_radius_mm = 180
+step_height_mm = 30
+max_stride_mm = 60
+
+[gait.duty_factor]
+wave = 0.8
+star = 0.6
+
+[motion]
+loop_hz = 100
+max_linear_accel_mps2 = 0.3
+max_angular_accel_dps2 = 90
