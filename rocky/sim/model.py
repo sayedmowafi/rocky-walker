@@ -76,6 +76,7 @@ def build_mjcf(cfg: RobotConfig) -> str:
         f'forcerange="{_f(-tau, tau)}" ctrlrange="{_f(*lim[k % 3])}"/>'
         for k, name in enumerate(joint_names(n))
     )
+    legs_xml = "".join(legs)
     stand_qpos = _f(0, 0, z0, 1, 0, 0, 0, *stand_angles(cfg).reshape(-1))
 
     return f"""<mujoco model="rocky">
@@ -99,7 +100,7 @@ def build_mjcf(cfg: RobotConfig) -> str:
       <freejoint name="root"/>
       <camera name="track" mode="trackcom" pos="0.7 -0.7 0.55" xyaxes="0.707 0.707 0 -0.3 0.3 0.9"/>
       <geom name="torso" type="cylinder" size="{_f(cfg.body.mount_radius, cfg.body.thickness / 2)}"
-            mass="{_f(torso_mass)}" contype="2" conaffinity="0" rgba="0.55 0.5 0.45 1"/>{"".join(legs)}
+            mass="{_f(torso_mass)}" contype="2" conaffinity="0" rgba="0.55 0.5 0.45 1"/>{legs_xml}
     </body>
   </worldbody>
   <actuator>
