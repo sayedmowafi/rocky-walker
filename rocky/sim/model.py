@@ -48,6 +48,13 @@ def stand_angles(cfg: RobotConfig) -> np.ndarray:
         ) from e
 
 
+def _inertial(mass: float, com: float, length: float) -> str:
+    """Thin-rod inertia about the segment's centre of mass (explicit, so geoms carry no mass)."""
+    i_yz = mass * length * length / 12
+    i_x = mass * 0.01 * 0.01 / 2
+    return f'<inertial pos="{_f(com)} 0 0" mass="{_f(mass)}" diaginertia="{_f(i_x, i_yz, i_yz)}"/>'
+
+
 def build_mjcf(cfg: RobotConfig) -> str:
     leg, lim, mass = cfg.leg, cfg.limits.as_array(), cfg.mass
     n = cfg.body.n_legs
@@ -62,14 +69,17 @@ def build_mjcf(cfg: RobotConfig) -> str:
         legs.append(f"""
       <body name="leg{i}" pos="{_f(*m.position)}" euler="0 0 {m.yaw:.9g}">
         <joint name="leg{i}_coxa" axis="0 0 1" range="{_f(*lim[0])}"/>
+        {_inertial(mass.coxa_link, mass.coxa_com, leg.coxa)}
         <geom type="capsule" fromto="0 0 0 {_f(leg.coxa)} 0 0" size="0.012"
               mass="{_f(mass.coxa_link)}" rgba="0.15 0.15 0.15 1"/>
         <body name="leg{i}_femur" pos="{_f(leg.coxa)} 0 0">
           <joint name="leg{i}_femur" axis="0 -1 0" range="{_f(*lim[1])}"/>
+          {_inertial(mass.femur_link, mass.femur_com, leg.femur)}
           <geom type="capsule" fromto="0 0 0 {_f(leg.femur)} 0 0" size="0.011"
                 mass="{_f(mass.femur_link)}" rgba="0.9 0.9 0.9 1"/>
           <body name="leg{i}_tibia" pos="{_f(leg.femur)} 0 0">
             <joint name="leg{i}_tibia" axis="0 -1 0" range="{_f(*lim[2])}"/>
+            {_inertial(mass.tibia_link, mass.tibia_com, leg.tibia)}
             <geom type="capsule" fromto="0 0 0 {_f(leg.tibia)} 0 0" size="0.008"
                   mass="{_f(mass.tibia_link - FOOT_MASS)}" rgba="0.2 0.45 0.85 1"/>
             <geom name="leg{i}_foot" type="sphere" pos="{_f(leg.tibia)} 0 0"

@@ -38,3 +38,9 @@ def test_stands_when_holding_neutral():
     assert data.qpos[2] == pytest.approx(expected_z, rel=0.10)
     up = data.xmat[model.body("torso").id].reshape(3, 3)[:, 2]
     assert np.degrees(np.arccos(np.clip(up[2], -1, 1))) < 5
+
+
+def test_segment_inertial_uses_com():
+    model = load_model(CFG)
+    np.testing.assert_allclose(model.body("leg0_femur").ipos, [CFG.mass.femur_com, 0, 0], atol=1e-9)
+    assert model.body("leg0_femur").mass[0] == pytest.approx(CFG.mass.femur_link)

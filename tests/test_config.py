@@ -55,3 +55,21 @@ def test_rejects_bad_values(raw, path, value, key):
     _set(data, path, value)
     with pytest.raises(ConfigError, match=key):
         parse_config(data)
+
+
+def test_com_fields_loaded():
+    cfg = load_config()
+    for name, length in (
+        ("coxa", cfg.leg.coxa),
+        ("femur", cfg.leg.femur),
+        ("tibia", cfg.leg.tibia),
+    ):
+        com = getattr(cfg.mass, f"{name}_com")
+        assert 0 <= com <= length
+
+
+def test_com_out_of_segment_rejected(raw):
+    data = copy.deepcopy(raw)
+    data["mass"]["femur_link_com_mm"] = 999
+    with pytest.raises(ConfigError, match="femur_link_com_mm"):
+        parse_config(data)

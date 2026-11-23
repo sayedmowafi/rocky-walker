@@ -39,6 +39,10 @@ class MassParams:
     coxa_link: float
     femur_link: float
     tibia_link: float
+    #: centre of mass along each segment's +x, from its proximal joint axis (m)
+    coxa_com: float
+    femur_com: float
+    tibia_com: float
 
 
 @dataclass(frozen=True)
@@ -143,22 +147,33 @@ def parse_config(data: dict[str, Any]) -> RobotConfig:
         thickness=num(b, "body", "thickness_mm") / 1000,
     )
 
-    m = table("mass")
-    mass = MassParams(
-        total=num(m, "mass", "total_kg"),
-        coxa_link=num(m, "mass", "coxa_link_kg"),
-        femur_link=num(m, "mass", "femur_link_kg"),
-        tibia_link=num(m, "mass", "tibia_link_kg"),
-    )
-    if n_legs * (mass.coxa_link + mass.femur_link + mass.tibia_link) >= mass.total:
-        raise ConfigError("mass.total_kg must exceed the summed leg link masses")
-
     lg = table("leg")
     leg = LegGeometry(
         coxa=num(lg, "leg", "coxa_mm") / 1000,
         femur=num(lg, "leg", "femur_mm") / 1000,
         tibia=num(lg, "leg", "tibia_mm") / 1000,
     )
+
+    m = table("mass")
+
+    def com(seg: str, length: float) -> float:
+        key = f"{seg}_link_com_mm"
+        v = num(m, "mass", key, positive=False) / 1000
+        if not 0 <= v <= length:
+            raise ConfigError(f"mass.{key} must be within the segment (0..{length * 1000:g} mm)")
+        return v
+
+    mass = MassParams(
+        total=num(m, "mass", "total_kg"),
+        coxa_link=num(m, "mass", "coxa_link_kg"),
+        femur_link=num(m, "mass", "femur_link_kg"),
+        tibia_link=num(m, "mass", "tibia_link_kg"),
+        coxa_com=com("coxa", leg.coxa),
+        femur_com=com("femur", leg.femur),
+        tibia_com=com("tibia", leg.tibia),
+    )
+    if n_legs * (mass.coxa_link + mass.femur_link + mass.tibia_link) >= mass.total:
+        raise ConfigError("mass.total_kg must exceed the summed leg link masses")
 
     lim = table("limits")
     limits = JointLimits(

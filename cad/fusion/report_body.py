@@ -52,7 +52,7 @@ def run(_context: str):
 
     def set_pose(coxa):
         for leg_occ in leg_occs:
-            joints = {j.name: j for j in leg_occ.component.asBuiltJoints}
+            joints = {j.name: j.createForAssemblyContext(leg_occ) for j in leg_occ.component.asBuiltJoints}
             for name, a in (("coxa", coxa), ("femur", t2), ("knee", t3)):
                 joints[name].jointMotion.rotationValue = flip[name] * a
         adsk.doEvents()
@@ -69,7 +69,7 @@ def run(_context: str):
     report["coxa_sweep"] = sweep
     for leg_occ in leg_occs:
         for j in leg_occ.component.asBuiltJoints:
-            j.jointMotion.rotationValue = 0.0
+            j.createForAssemblyContext(leg_occ).jointMotion.rotationValue = 0.0
 
     printed = {}
     for occ in body_occ.childOccurrences:
