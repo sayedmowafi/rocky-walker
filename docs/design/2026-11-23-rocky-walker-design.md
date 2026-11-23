@@ -104,7 +104,7 @@ That puts the robot at about **35–45 cm across** with the legs in a standing p
 
 ### 6.3 Leg lengths and the torque rule
 
-**Frozen values (M1).** See [build log #1](../build-log/2026-11-23-01-walking-in-sim.md). Leg lengths are unchanged from the starting values. Stance radius moved from 180 to **165 mm** to give torque margin: both gaits stay within the rule up to 2.4 kg in simulation.
+**Frozen values (M1).** See [build log #1](../build-log/2026-11-23-01-walking-in-sim.md). Leg lengths are unchanged from the starting values. Stance radius moved from 180 to **165 mm** to give torque margin. The default wave gait stays within the rule up to 2.4 kg in simulation. Star passes at the 2.0 kg design mass, but starting it from a standstill exceeds the rule from 2.2 kg.
 
 | Segment | Length |
 |---|---|

@@ -91,6 +91,15 @@ def test_feet_stay_within_half_stride():
     assert xy_dist(steady).max() <= CFG.gait.max_stride / 2 + 1e-3
 
 
+@pytest.mark.parametrize("gait", ["wave", "star"])
+def test_combined_walk_and_turn_feet_bounded(gait):
+    gen = make(gait)
+    cmd = BodyVelocity(vx=10, vy=4, wz=-10)
+    run(gen, cmd, PERIOD)
+    steady = run(gen, cmd, 30.0)
+    assert xy_dist(steady).max() <= CFG.gait.max_stride / 2 + 1e-3
+
+
 def test_continuous_turn_feet_bounded():
     gen = make()
     cmd = BodyVelocity(wz=10)
@@ -109,12 +118,13 @@ def test_stop_mid_step_settles_to_neutral():
         np.testing.assert_array_equal(feet, settled)
 
 
-def test_resume_from_idle_is_continuous():
-    gen = make()
+@pytest.mark.parametrize("gait", ["wave", "star"])
+def test_resume_from_idle_is_continuous(gait):
+    gen = make(gait)
     run(gen, BodyVelocity(), 1.0)
     cmd = BodyVelocity(vx=0.04)
     prev = gen.feet
-    t_swing = (1 - CFG.gait.duty_factor["wave"]) * PERIOD
+    t_swing = (1 - CFG.gait.duty_factor[gait]) * PERIOD
     bound = DT * (np.pi * CFG.gait.step_height + 1.5 * CFG.gait.max_stride) / t_swing
     bound += 0.04 * DT + 1e-9
     for feet in run(gen, cmd, 2.0):

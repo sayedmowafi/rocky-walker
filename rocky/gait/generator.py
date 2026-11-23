@@ -56,8 +56,13 @@ class GaitGenerator:
 
     def _reset_phase(self) -> None:
         self._phase = 0.0
-        # Sentinel above any local phase: the leg whose window opens at phase 0 starts at once.
-        self._prev_local = [1.0] * self._n
+        # The leg whose window opens at phase 0 gets a sentinel so it lifts at once. Every
+        # other leg remembers its true local phase, so a leg already mid-window (star gait)
+        # waits for its next window instead of starting a swing half-way up.
+        self._prev_local = [
+            1.0 if local == 0.0 else local
+            for local in (self._pattern.local_phase(i, 0.0) for i in range(self._n))
+        ]
 
     def clamp(self, cmd: BodyVelocity) -> BodyVelocity:
         """Scale ``cmd`` down so no leg's stride exceeds ``max_stride``."""
@@ -68,7 +73,7 @@ class GaitGenerator:
         if stride <= self._max_stride:
             return cmd
         s = self._max_stride / stride
-        return BodyVelocity(cmd.vx * s, cmd.vy * s, cmd.wz * s)
+        return BodyVelocity(float(cmd.vx * s), float(cmd.vy * s), float(cmd.wz * s))
 
     def _settled(self) -> bool:
         dist = np.linalg.norm(self._feet[:, :2] - self._neutral[:, :2], axis=1)

@@ -6,6 +6,7 @@ config file is the single source of truth for CAD, simulation and kinematics.
 
 from __future__ import annotations
 
+import math
 import tomllib
 from dataclasses import dataclass
 from math import radians
@@ -115,6 +116,8 @@ def parse_config(data: dict[str, Any]) -> RobotConfig:
         v = t[key]
         if isinstance(v, bool) or not isinstance(v, int | float):
             raise ConfigError(f"{section}.{key} must be a number, got {v!r}")
+        if not math.isfinite(v):
+            raise ConfigError(f"{section}.{key} must be finite, got {v}")
         if positive and v <= 0:
             raise ConfigError(f"{section}.{key} must be > 0, got {v}")
         return float(v)
@@ -124,6 +127,8 @@ def parse_config(data: dict[str, Any]) -> RobotConfig:
         if not (isinstance(v, list) and len(v) == 2):
             raise ConfigError(f"limits.{key} must be a [min, max] pair")
         lo, hi = float(v[0]), float(v[1])
+        if not (math.isfinite(lo) and math.isfinite(hi)):
+            raise ConfigError(f"limits.{key} must be finite, got {v}")
         if lo >= hi:
             raise ConfigError(f"limits.{key} must have min < max, got {v}")
         return radians(lo), radians(hi)

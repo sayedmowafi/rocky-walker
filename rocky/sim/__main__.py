@@ -18,7 +18,7 @@ from pathlib import Path
 import numpy as np
 
 from rocky.commands import BodyVelocity
-from rocky.config import DEFAULT_CONFIG_PATH, RobotConfig, load_config
+from rocky.config import DEFAULT_CONFIG_PATH, ConfigError, RobotConfig, load_config
 from rocky.sim.model import joint_names
 from rocky.sim.runner import SimResult, simulate
 
@@ -107,6 +107,14 @@ def main(argv: list[str] | None = None) -> int:
     torque.add_argument("--gait", choices=["wave", "star"], default=None)
 
     args = parser.parse_args(argv)
+    try:
+        return _run(args)
+    except ConfigError as e:
+        print(f"config error: {e}", file=sys.stderr)
+        return 2
+
+
+def _run(args: argparse.Namespace) -> int:
     cfg = load_config(args.config)
     gait = args.gait or cfg.gait.default
 

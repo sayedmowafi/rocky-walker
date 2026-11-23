@@ -27,6 +27,8 @@ def leg_fk(angles: np.ndarray, geom: LegGeometry) -> np.ndarray:
 def leg_ik(foot: np.ndarray, geom: LegGeometry) -> np.ndarray:
     """Joint angles ``(coxa, femur, tibia)`` that put the foot at ``foot`` (leg frame)."""
     x, y, z = foot
+    if not np.isfinite(foot).all():
+        raise UnreachableError(f"foot {foot!r} is not finite")
     t1 = np.arctan2(y, x)
     r = np.hypot(x, y) - geom.coxa
     lf, lt = geom.femur, geom.tibia

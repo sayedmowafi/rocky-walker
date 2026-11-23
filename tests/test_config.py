@@ -45,6 +45,9 @@ _DELETE = object()
         ("body.n_legs", 6, "n_legs"),
         ("motion.loop_hz", 30, "loop_hz"),
         ("servo", _DELETE, "servo"),
+        ("gait.max_stride_mm", float("nan"), "max_stride_mm"),
+        ("gait.period_s", float("inf"), "period_s"),
+        ("limits.coxa_deg", [float("nan"), 45], "coxa_deg"),
     ],
 )
 def test_rejects_bad_values(raw, path, value, key):

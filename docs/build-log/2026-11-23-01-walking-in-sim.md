@@ -39,13 +39,15 @@ My mass estimate is 1.8–2.1 kg, and real builds always come out heavier, so 10
 
 **The fix: shrink before upgrading.** I brought the feet 15 mm closer to the body (stance radius 180 → **165 mm**). That cuts the femur lever from 70 mm to 55 mm.
 
-| Robot mass | Wave | Star |
-|---|---|---|
-| 2.0 kg | 74% | 79% |
-| 2.2 kg | 82% | 88% |
-| 2.4 kg | 90% | 96% |
+| Robot mass | Wave (default) | Star, worst incl. start-up | Star, once walking |
+|---|---|---|---|
+| 2.0 kg | 73% | 90% | 78% |
+| 2.2 kg | 82% | 101% ❌ | 87% |
+| 2.4 kg | 90% | 112% ❌ | 95% |
 
-Both gaits now pass even if Rocky comes out 20% heavier than estimated. Walking accuracy and tilt didn't change measurably (tilt stays under 1°).
+The default wave gait now passes even if Rocky comes out 20% heavier than estimated. Star passes at the design mass. Once it's walking it stays inside the rule up to 2.4 kg, but **starting** in star from a standstill goes over at 2.2 kg, because the last leg drags a long way before its first step. If the real robot comes out heavy, the fix is to start walking in wave and switch to star once moving. Walking accuracy and tilt didn't change measurably (tilt stays under 1°).
+
+*(These numbers include the fixes from the code review below, which made start-up more honest and a little harder on star.)*
 
 ## Frozen values (M1)
 
@@ -59,14 +61,15 @@ Both gaits now pass even if Rocky comes out 20% heavier than estimated. Walking 
 | Max stride | 60 mm |
 | Gait period | 1.5 s (wave duty 0.8, star duty 0.6) |
 | Top speed | wave 5 cm/s, star 6.7 cm/s |
+| Acceleration limit | 0.15 m/s², 45°/s² (≈0.4 s to top speed) |
 
 Torque at 80% of top speed, 2.0 kg, worst leg:
 
 | Joint | Wave (sustained) | Star (sustained) |
 |---|---|---|
 | Coxa (hip yaw) | 0.054 N·m | 0.054 N·m |
-| Femur (hip lift) | 0.362 N·m | 0.388 N·m |
-| Tibia (knee) | 0.193 N·m | 0.276 N·m |
+| Femur (hip lift) | 0.36 N·m | 0.44 N·m (start-up) |
+| Tibia (knee) | 0.19 N·m | 0.28 N·m |
 
 ## What didn't go perfectly
 
@@ -74,6 +77,16 @@ Torque at 80% of top speed, 2.0 kg, worst leg:
 - **Rocky walks about 5% further than commanded.** Feet start from neutral rather than mid-stride, so the first steps add a little extra. It's harmless, but it will matter for follow mode later.
 - **Floating-point maths nearly broke the gait.** `0.6 − 0.2` isn't exactly `0.4` in floating point, and at exact phase boundaries that briefly put two neighbouring legs in the air together. The tests caught it, and phases are now rounded at the boundaries.
 - **The simulator is optimistic.** It has perfect servos with no gear slop or deadband, rigid parts and an even floor. The real MG996Rs will be worse, which is exactly why I wanted the margin.
+
+## What the code review caught
+
+Before calling M1 done, the whole branch got an independent review. It found real bugs that the walking tests didn't catch, because those tests only used sensible joystick inputs:
+
+- **Holding the joystick past top speed wound up the command.** The speed ramp chased the raw joystick value (say 5 m/s) while the legs could only do 5 cm/s. After letting go, Rocky kept walking for **about 11 seconds**. The command is now limited to what the legs can do *before* it's ramped.
+- **The star gait jerked one leg 30 mm up in a single tick** whenever it started from standing. That leg was already half-way through its step window, so it started its step half-way up. On real servos that's a 2,600°/s demand. It now waits for its next window.
+- **One bad number (NaN) froze the controller forever.** Invalid commands are now rejected and counted, and the config refuses `nan`/`inf`.
+- **The start-up check only looked at the standing pose.** Rocky now drives a scratch copy of itself at full speed in 20 directions, then reverses, and refuses to start if any joint would hit a limit. The check immediately caught that full-speed start-up and reversal pushed the hip-yaw joint 1° past its ±45° limit. **Halving the acceleration limit** (to 0.15 m/s²) fixed it.
+- **Every safety guard now counts when it activates,** so the tests prove normal walking never needs the guards, not just that the guards exist.
 
 ## Next: M2, one leg on the bench
 

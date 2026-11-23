@@ -42,5 +42,5 @@ star = 0.6
 
 [motion]
 loop_hz = 100
-max_linear_accel_mps2 = 0.3
-max_angular_accel_dps2 = 90
+max_linear_accel_mps2 = 0.15   # gentler start/reversal keeps feet inside the joint limits
+max_angular_accel_dps2 = 45

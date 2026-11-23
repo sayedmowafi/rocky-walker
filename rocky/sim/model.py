@@ -9,9 +9,9 @@ from __future__ import annotations
 import mujoco
 import numpy as np
 
-from rocky.config import RobotConfig
+from rocky.config import ConfigError, RobotConfig
 from rocky.kinematics.body import body_to_leg, leg_mounts, neutral_feet
-from rocky.kinematics.leg import leg_ik
+from rocky.kinematics.leg import UnreachableError, leg_ik
 
 FOOT_RADIUS = 0.010
 FOOT_MASS = 0.005
@@ -37,7 +37,15 @@ def _f(*values: float) -> str:
 def stand_angles(cfg: RobotConfig) -> np.ndarray:
     """Joint angles of the neutral stance, shape ``(n_legs, 3)``."""
     feet = neutral_feet(cfg)
-    return np.array([leg_ik(body_to_leg(feet[m.index], m), cfg.leg) for m in leg_mounts(cfg.body)])
+    try:
+        return np.array(
+            [leg_ik(body_to_leg(feet[m.index], m), cfg.leg) for m in leg_mounts(cfg.body)]
+        )
+    except UnreachableError as e:
+        raise ConfigError(
+            "neutral stance is out of reach: check gait.stance_radius_mm, "
+            "gait.body_height_mm and the [leg] lengths"
+        ) from e
 
 
 def build_mjcf(cfg: RobotConfig) -> str:
