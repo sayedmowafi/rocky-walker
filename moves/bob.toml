@@ -1,0 +1,40 @@
+# Body bobs down and up 15 mm, four times.
+name = "bob"
+
+[[key]]
+t = 0.0
+
+[[key]]
+t = 0.4
+z_mm = -15.0
+
+[[key]]
+t = 0.75
+z_mm = 15.0
+
+[[key]]
+t = 1.1
+z_mm = -15.0
+
+[[key]]
+t = 1.45
+z_mm = 15.0
+
+[[key]]
+t = 1.8
+z_mm = -15.0
+
+[[key]]
+t = 2.15
+z_mm = 15.0
+
+[[key]]
+t = 2.5
+z_mm = -15.0
+
+[[key]]
+t = 2.85
+z_mm = 15.0
+
+[[key]]
+t = 3.3

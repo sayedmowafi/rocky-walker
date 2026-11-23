@@ -1,0 +1,3 @@
+# The full dance: every move in order.
+name = "routine"
+sequence = ["sway", "bob", "twist", "tilt-circle", "leg-wave"]

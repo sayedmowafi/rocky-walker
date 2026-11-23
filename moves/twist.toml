@@ -1,0 +1,32 @@
+# Body twists +/-15 degrees about the vertical, three times.
+name = "twist"
+
+[[key]]
+t = 0.0
+
+[[key]]
+t = 0.4
+yaw_deg = 15.0
+
+[[key]]
+t = 0.9
+yaw_deg = -15.0
+
+[[key]]
+t = 1.4
+yaw_deg = 15.0
+
+[[key]]
+t = 1.9
+yaw_deg = -15.0
+
+[[key]]
+t = 2.4
+yaw_deg = 15.0
+
+[[key]]
+t = 2.9
+yaw_deg = -15.0
+
+[[key]]
+t = 3.4

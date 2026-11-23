@@ -1,0 +1,88 @@
+# Body tilts around a circle (roll/pitch 8 degrees), twice.
+name = "tilt-circle"
+
+[[key]]
+t = 0.0
+
+[[key]]
+t = 0.5
+roll_deg = 0.0
+pitch_deg = 8.0
+
+[[key]]
+t = 0.75
+roll_deg = 5.66
+pitch_deg = 5.66
+
+[[key]]
+t = 1.0
+roll_deg = 8.0
+pitch_deg = 0.0
+
+[[key]]
+t = 1.25
+roll_deg = 5.66
+pitch_deg = -5.66
+
+[[key]]
+t = 1.5
+roll_deg = 0.0
+pitch_deg = -8.0
+
+[[key]]
+t = 1.75
+roll_deg = -5.66
+pitch_deg = -5.66
+
+[[key]]
+t = 2.0
+roll_deg = -8.0
+pitch_deg = -0.0
+
+[[key]]
+t = 2.25
+roll_deg = -5.66
+pitch_deg = 5.66
+
+[[key]]
+t = 2.5
+roll_deg = 0.0
+pitch_deg = 8.0
+
+[[key]]
+t = 2.75
+roll_deg = 5.66
+pitch_deg = 5.66
+
+[[key]]
+t = 3.0
+roll_deg = 8.0
+pitch_deg = 0.0
+
+[[key]]
+t = 3.25
+roll_deg = 5.66
+pitch_deg = -5.66
+
+[[key]]
+t = 3.5
+roll_deg = 0.0
+pitch_deg = -8.0
+
+[[key]]
+t = 3.75
+roll_deg = -5.66
+pitch_deg = -5.66
+
+[[key]]
+t = 4.0
+roll_deg = -8.0
+pitch_deg = -0.0
+
+[[key]]
+t = 4.25
+roll_deg = -5.66
+pitch_deg = 5.66
+
+[[key]]
+t = 4.9

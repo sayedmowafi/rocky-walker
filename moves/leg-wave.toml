@@ -1,0 +1,78 @@
+# Shift the body away from leg 0, lift leg 0 and wave it, put it down, shift back.
+name = "leg-wave"
+
+[[key]]
+t = 0.0
+
+[[key]]
+t = 0.6
+x_mm = -15.0
+
+[[key]]
+t = 1.1
+x_mm = -15.0
+[[key.foot]]
+leg = 0
+dz_mm = 40
+
+[[key]]
+t = 1.5
+x_mm = -15.0
+[[key.foot]]
+leg = 0
+dy_mm = 25
+dz_mm = 45
+
+[[key]]
+t = 1.85
+x_mm = -15.0
+[[key.foot]]
+leg = 0
+dy_mm = -25
+dz_mm = 45
+
+[[key]]
+t = 2.2
+x_mm = -15.0
+[[key.foot]]
+leg = 0
+dy_mm = 25
+dz_mm = 45
+
+[[key]]
+t = 2.55
+x_mm = -15.0
+[[key.foot]]
+leg = 0
+dy_mm = -25
+dz_mm = 45
+
+[[key]]
+t = 2.9
+x_mm = -15.0
+[[key.foot]]
+leg = 0
+dy_mm = 25
+dz_mm = 45
+
+[[key]]
+t = 3.25
+x_mm = -15.0
+[[key.foot]]
+leg = 0
+dy_mm = -25
+dz_mm = 45
+
+[[key]]
+t = 3.6
+x_mm = -15.0
+[[key.foot]]
+leg = 0
+dz_mm = 40
+
+[[key]]
+t = 4.0
+x_mm = -15.0
+
+[[key]]
+t = 4.5

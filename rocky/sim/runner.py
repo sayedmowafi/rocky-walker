@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -13,7 +13,7 @@ from rocky.backends.mujoco_backend import MujocoBackend
 from rocky.commands import BodyVelocity
 from rocky.config import RobotConfig
 from rocky.motion.controller import MotionController
-from rocky.sim.model import load_model
+from rocky.sim.model import TIMESTEP, load_model
 
 VIDEO_FPS = 30
 
@@ -54,16 +54,51 @@ def simulate(
     video_path: Path | None = None,
 ) -> SimResult:
     """Simulate ``duration`` seconds of ``commands(t)`` after ``settle_s`` of standing still."""
+    controller = MotionController(cfg, gait)
+    dt = _tick_dt(cfg)
+
+    def angles_at(k: int, t: float, in_settle: bool) -> np.ndarray:
+        cmd = BodyVelocity() if in_settle else commands(t - settle_s)
+        return controller.tick(dt, cmd)
+
+    return _run(cfg, angles_at, round(duration / dt), settle_s, video_path)
+
+
+def simulate_angles(
+    cfg: RobotConfig,
+    angles: Sequence[np.ndarray],
+    settle_s: float = 1.0,
+    video_path: Path | None = None,
+) -> SimResult:
+    """Play a precomputed joint-angle stream (one ``(5, 3)`` array per control tick, at
+    ``loop_hz``) on the free-standing model, after ``settle_s`` holding the first frame."""
+
+    def angles_at(k: int, t: float, in_settle: bool) -> np.ndarray:
+        return angles[0] if in_settle else angles[k]
+
+    return _run(cfg, angles_at, len(angles), settle_s, video_path)
+
+
+def _tick_dt(cfg: RobotConfig) -> float:
+    substeps = max(1, round(1 / (cfg.motion.loop_hz * TIMESTEP)))
+    return substeps * TIMESTEP
+
+
+def _run(
+    cfg: RobotConfig,
+    angles_at: Callable[[int, float, bool], np.ndarray],
+    n_active: int,
+    settle_s: float,
+    video_path: Path | None,
+) -> SimResult:
     model = load_model(cfg)
     data = mujoco.MjData(model)
     mujoco.mj_resetDataKeyframe(model, data, model.key("stand").id)
-    controller = MotionController(cfg, gait)
     backend = MujocoBackend(model, data)
     torso = model.body("torso").id
 
     substeps = max(1, round(1 / (cfg.motion.loop_hz * model.opt.timestep)))
     dt = substeps * model.opt.timestep
-    n_ticks = round((settle_s + duration) / dt)
     n_settle = round(settle_s / dt)
 
     renderer, frames, next_frame = None, [], 0.0
@@ -75,17 +110,17 @@ def simulate(
         renderer = mujoco.Renderer(model, height=480, width=640)
 
     times, pos, yaw, tilt, torque = [], [], [], [], []
-    for k in range(n_ticks):
+    for k in range(n_settle + n_active):
         t = k * dt
-        cmd = BodyVelocity() if k < n_settle else commands(t - settle_s)
-        backend.write(controller.tick(dt, cmd))
+        in_settle = k < n_settle
+        backend.write(angles_at(k - n_settle, t, in_settle))
         for _ in range(substeps):
             mujoco.mj_step(model, data)
         if renderer is not None and data.time >= next_frame:
             renderer.update_scene(data, camera="track")
             frames.append(renderer.render())
             next_frame += 1 / VIDEO_FPS
-        if k >= n_settle:
+        if not in_settle:
             times.append(t + dt - settle_s)
             pos.append(data.qpos[:3].copy())
             yaw.append(_yaw(data.qpos[3:7]))
