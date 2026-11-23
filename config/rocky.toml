@@ -20,8 +20,8 @@ tibia_mm = 100
 
 [limits]
 coxa_deg = [-45, 45]
-femur_deg = [-60, 90]
-tibia_deg = [-150, -20]
+femur_deg = [-40, 40]     # M2: physical clear range from the Fusion leg (was [-60, 90])
+tibia_deg = [-135, -20]   # M2: physical clear range from the Fusion leg (was [-150, -20])
 
 [servo]                 # MG996R at 6 V
 stall_torque_kgcm = 11.0

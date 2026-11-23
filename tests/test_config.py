@@ -16,7 +16,7 @@ def raw():
 def test_loads_default_config_in_si():
     cfg = load_config()
     assert cfg.leg.femur == pytest.approx(0.070)
-    assert cfg.limits.tibia == pytest.approx((radians(-150), radians(-20)))
+    assert cfg.limits.tibia == pytest.approx((radians(-135), radians(-20)))
     assert cfg.servo.torque_rule == pytest.approx(0.490, abs=1e-3)
     assert cfg.servo.max_speed == pytest.approx(radians(400))
     assert cfg.gait.duty_factor["star"] == 0.6

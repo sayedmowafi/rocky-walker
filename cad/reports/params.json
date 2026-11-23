@@ -19,8 +19,8 @@
     "coxa_max_deg": 45.0,
     "coxa_min_deg": -45.0,
     "coxa_mm": 40.0,
-    "femur_max_deg": 90.0,
-    "femur_min_deg": -60.0,
+    "femur_max_deg": 40.0,
+    "femur_min_deg": -40.0,
     "femur_mm": 70.0,
     "fit_clearance": 0.3,
     "horn_bolt_circle": 14.0,
@@ -41,7 +41,7 @@
     "servo_shaft_offset": 10.2,
     "servo_w": 19.7,
     "tibia_max_deg": -20.0,
-    "tibia_min_deg": -150.0,
+    "tibia_min_deg": -135.0,
     "tibia_mm": 100.0,
     "wall": 3.0
   }

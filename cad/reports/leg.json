@@ -1,0 +1,55 @@
+{
+  "clear_range_deg": {
+    "coxa": [
+      -45,
+      45
+    ],
+    "femur": [
+      -40,
+      40
+    ],
+    "knee": [
+      -135,
+      -20
+    ]
+  },
+  "interference_neutral": [],
+  "interference_zero": [],
+  "joint_origins_mm": {
+    "coxa": 0.0,
+    "femur": 40.0,
+    "knee": 110.0
+  },
+  "limit_sweep": {},
+  "printed": {
+    "Coxa": {
+      "bbox_mm": [
+        66.15,
+        37.75,
+        64.45
+      ],
+      "volume_mm3": 29862.4
+    },
+    "Femur": {
+      "bbox_mm": [
+        102.15,
+        60.7,
+        26.3
+      ],
+      "volume_mm3": 33064.6
+    },
+    "Tibia": {
+      "bbox_mm": [
+        115.08,
+        60.7,
+        63.08
+      ],
+      "volume_mm3": 32538.4
+    }
+  },
+  "stance_deg": {
+    "coxa": 0.0,
+    "femur": -0.92,
+    "knee": -97.7
+  }
+}

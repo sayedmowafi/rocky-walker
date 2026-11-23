@@ -1,0 +1,388 @@
+"""Rocky Walker / Fusion step 02: the leg (coxa bracket, femur, tibia, bought-part placeholders,
+revolute joints, fit coupon).
+
+Geometry is computed from the Fusion user parameters at run time; re-running this script
+rebuilds the leg from the current parameter values (it deletes the previous leg parts first).
+All coordinates are in the Leg frame (mm): origin on the coxa axis, +x radially outward, z up,
+femur axis along y at x = coxa_mm, knee axis along y at x = coxa_mm + femur_mm.
+
+Servo convention (MG996R placeholder, local frame): origin on the shaft axis at the servo's top
+face, local Z = shaft direction, local X = along the body length from the shaft toward the far
+end. Horn plate sits on the spline (Z from spline_h - horn_t to spline_h); the driven printed
+arm starts at Z = spline_h. Each joint has an idler on the opposite side: an M3 bolt in the
+servo-side part running in a 623 bearing pressed into the driven part.
+"""
+
+import adsk.core
+import adsk.fusion
+
+MM = 0.1  # Fusion API lengths are cm
+
+
+def run(_context: str):
+    app = adsk.core.Application.get()
+    design = adsk.fusion.Design.cast(app.activeProduct)
+    root = design.rootComponent
+    P = {p.name: p.value for p in design.userParameters}
+
+    def mm(name):
+        return P[name] / MM
+
+    LC, LF, LT = mm("coxa_mm"), mm("femur_mm"), mm("tibia_mm")
+    SL, SW, SH = mm("servo_l"), mm("servo_w"), mm("servo_h")
+    EL, EP, EG = mm("servo_ear_l"), mm("servo_ear_hole_pitch"), mm("servo_ear_hole_gap")
+    EZ, ET, SO, SS = mm("servo_ear_z"), mm("servo_ear_t"), mm("servo_shaft_offset"), mm("servo_shaft_h")
+    C, WALL = mm("fit_clearance"), mm("wall")
+    M3, NAF, NT = mm("m3_clear"), mm("m3_nut_af"), mm("m3_nut_t")
+    BOD, BID, BW = mm("bearing_od"), mm("bearing_id"), mm("bearing_w")
+    HD, HT, HBC = mm("horn_d"), mm("horn_t"), mm("horn_bolt_circle")
+    ARM = 4.0  # driven arm plate thickness (horn side)
+    IDL = 5.0  # idler arm thickness (bearing side, 1 mm floor behind the bearing)
+    GAP = 0.5  # running gap between parts
+    HUB = 13.0  # hub radius around joint axes
+
+    tbm = adsk.fusion.TemporaryBRepManager.get()
+    V = adsk.core.Vector3D.create
+    Pt = adsk.core.Point3D.create
+    UNION = adsk.fusion.BooleanTypes.UnionBooleanType
+    CUT = adsk.fusion.BooleanTypes.DifferenceBooleanType
+    INTER = adsk.fusion.BooleanTypes.IntersectionBooleanType
+
+    # ---------- primitive helpers (mm in, temporary B-Rep out) ----------
+    def box(x0, x1, y0, y1, z0, z1):
+        c = Pt((x0 + x1) / 2 * MM, (y0 + y1) / 2 * MM, (z0 + z1) / 2 * MM)
+        obb = adsk.core.OrientedBoundingBox3D.create(
+            c, V(1, 0, 0), V(0, 1, 0), abs(x1 - x0) * MM, abs(y1 - y0) * MM, abs(z1 - z0) * MM
+        )
+        return tbm.createBox(obb)
+
+    def cyl(p0, p1, r):
+        return tbm.createCylinderOrCone(Pt(*[v * MM for v in p0]), r * MM, Pt(*[v * MM for v in p1]), r * MM)
+
+    def cone(p0, r0, p1, r1):
+        return tbm.createCylinderOrCone(Pt(*[v * MM for v in p0]), r0 * MM, Pt(*[v * MM for v in p1]), r1 * MM)
+
+    def sphere(c, r):
+        return tbm.createSphere(Pt(*[v * MM for v in c]), r * MM)
+
+    def hexprism(center, axis, af, depth):
+        """Hex nut pocket: axis in {'x','y','z'}, from center along +axis for depth."""
+        import math
+
+        big = af * 3
+        out = None
+        for k in range(3):
+            a = math.radians(60 * k)
+            ca, sa = math.cos(a), math.sin(a)
+            # slab of width af across direction (ca, sa) in the plane normal to axis
+            if axis == "y":
+                lx, lz = V(ca, 0, sa), V(-sa, 0, ca)
+                ly = V(0, 1, 0)
+                c = Pt(center[0] * MM, (center[1] + depth / 2) * MM, center[2] * MM)
+                obb = adsk.core.OrientedBoundingBox3D.create(c, lx, lz, af * MM, big * MM, depth * MM)
+            elif axis == "z":
+                lx, ly = V(ca, sa, 0), V(-sa, ca, 0)
+                c = Pt(center[0] * MM, center[1] * MM, (center[2] + depth / 2) * MM)
+                obb = adsk.core.OrientedBoundingBox3D.create(c, lx, ly, af * MM, big * MM, depth * MM)
+            else:
+                ly, lz = V(0, ca, sa), V(0, -sa, ca)
+                c = Pt((center[0] + depth / 2) * MM, center[1] * MM, center[2] * MM)
+                obb = adsk.core.OrientedBoundingBox3D.create(c, ly, lz, af * MM, big * MM, depth * MM)
+            s = tbm.createBox(obb)
+            if out is None:
+                out = s
+            else:
+                tbm.booleanOperation(out, s, INTER)
+        return out
+
+    def uni(*bodies):
+        out = bodies[0]
+        for b in bodies[1:]:
+            tbm.booleanOperation(out, b, UNION)
+        return out
+
+    def cut(target, *tools):
+        for t in tools:
+            tbm.booleanOperation(target, t, CUT)
+        return target
+
+    def frame_matrix(origin, zdir, xdir):
+        z = V(*zdir)
+        x = V(*xdir)
+        y = z.crossProduct(x)
+        m = adsk.core.Matrix3D.create()
+        m.setWithCoordinateSystem(Pt(*[v * MM for v in origin]), x, y, z)
+        return m
+
+    def place(body, origin, zdir, xdir):
+        tbm.transform(body, frame_matrix(origin, zdir, xdir))
+        return body
+
+    # ---------- bought-part placeholders (built in servo-local frame, then placed) ----------
+    ear_cx = SL / 2 - SO  # ear/body centre along local X from the shaft
+
+    def servo(origin, zdir, xdir):
+        b = box(-SO, SL - SO, -SW / 2, SW / 2, -SH, 0)
+        ears = box(ear_cx - EL / 2, ear_cx + EL / 2, -SW / 2, SW / 2, -SH + EZ, -SH + EZ + ET)
+        spline = cyl((0, 0, 0), (0, 0, SS - HT), 3.0)
+        return place(uni(b, ears, spline), origin, zdir, xdir)
+
+    def horn(origin, zdir, xdir):
+        return place(cyl((0, 0, SS - HT), (0, 0, SS), HD / 2), origin, zdir, xdir)
+
+    def bearing(p0, p1):
+        return cut(cyl(p0, p1, BOD / 2), cyl(p0, p1, BID / 2))
+
+    # ear screw positions in servo-local frame (ear plane underside at Z = -SH + EZ)
+    ear_holes = [(ear_cx + sx * EP / 2, sy * EG / 2) for sx in (-1, 1) for sy in (-1, 1)]
+
+    def cradle(origin, zdir, xdir):
+        """Printed servo cradle in servo-local frame: walls around the body, a floor under
+        the servo base (with the idler bolt hole on the shaft axis), and an ear plate under the
+        ears with M3 holes + hex nut pockets. Open on the shaft side."""
+        o = C + WALL
+        floor_z0 = -SH - C - WALL
+        body = box(-SO - o, SL - SO + o, -SW / 2 - o, SW / 2 + o, floor_z0, -SH + EZ)
+        plate = box(ear_cx - EL / 2 - 2, ear_cx + EL / 2 + 2, -SW / 2 - o, SW / 2 + o, -SH + EZ - WALL, -SH + EZ)
+        c = uni(body, plate)
+        pocket = box(-SO - C, SL - SO + C, -SW / 2 - C, SW / 2 + C, -SH - C, 10)
+        cut(c, pocket)
+        cut(c, cyl((0, 0, floor_z0 - 1), (0, 0, -SH + 1), M3 / 2))  # idler bolt
+        for hx, hy in ear_holes:
+            cut(c, cyl((hx, hy, -SH + EZ - WALL - 1), (hx, hy, -SH + EZ + 1), M3 / 2))
+            cut(c, hexprism((hx, hy, -SH + EZ - WALL - 0.01), "z", NAF, NT))
+        return place(c, origin, zdir, xdir)
+
+    def horn_holes(center_axis_p0, axis, length):
+        """4 M3 holes on the horn bolt circle + a centre clearance hole, through a plate."""
+        import math
+
+        holes = []
+        ax = {"y": (0, 1, 0), "z": (0, 0, 1)}[axis]
+        for k in range(4):
+            a = math.radians(45 + 90 * k)
+            r = HBC / 2
+            if axis == "y":
+                off = (r * math.cos(a), 0, r * math.sin(a))
+            else:
+                off = (r * math.cos(a), r * math.sin(a), 0)
+            p0 = tuple(center_axis_p0[i] + off[i] for i in range(3))
+            p1 = tuple(p0[i] + ax[i] * length for i in range(3))
+            holes.append(cyl(p0, p1, M3 / 2))
+        p1 = tuple(center_axis_p0[i] + ax[i] * length for i in range(3))
+        holes.append(cyl(center_axis_p0, p1, 4.0))
+        return holes
+
+    # ---------- servo placements ----------
+    y_top = SH / 2  # servos on the femur and knee axes are centred on y = 0
+    # coxa servo: vertical, shaft +z on the coxa axis, body toward the body centre (-x)
+    coxa_arm_z0 = 21.0  # underside of the coxa bracket's top arm = coxa horn top
+    coxa_top = coxa_arm_z0 - SS
+    coxa_servo_frame = ((0, 0, coxa_top), (0, 0, 1), (-1, 0, 0))
+    femur_servo_frame = ((LC, y_top, 0), (0, 1, 0), (0, 0, -1))  # body hangs below the axis
+    knee_x = LC + LF
+    knee_servo_frame = ((knee_x, y_top, 0), (0, 1, 0), (-1, 0, 0))  # body toward the hip
+
+    arm_y0 = y_top + SS  # horn-side arm inner face
+    arm_y1 = arm_y0 + ARM
+    floor_y = -SH / 2 - C - WALL  # cradle floor outer face (servo-side idler)
+    idl_y1 = floor_y - GAP
+    idl_y0 = idl_y1 - IDL
+
+    # ---------- coxa bracket ----------
+    fc = cradle(*femur_servo_frame)
+    # cradle extents in leg frame
+    o = C + WALL
+    cr_x0, cr_x1 = LC - SW / 2 - o, LC + SW / 2 + o
+    top_z0, top_z1 = coxa_arm_z0, coxa_arm_z0 + ARM
+    bot_z1 = coxa_top - SH - C - WALL - GAP  # under the chassis bottom plate (WALL thick)
+    bot_z0 = bot_z1 - IDL
+    cr_y0, cr_y1 = floor_y, -SH / 2 + EZ  # cradle y range (floor .. ear plate top)
+    top_arm = uni(
+        cyl((0, 0, top_z0), (0, 0, top_z1), HUB),
+        box(0, cr_x1, -HUB, HUB, top_z0, top_z1),
+        box(cr_x0, cr_x1, cr_y0, cr_y1, top_z0, top_z1),
+    )
+    cut(top_arm, *horn_holes((0, 0, top_z0 - 1), "z", ARM + 2))
+    bot_arm = uni(
+        cyl((0, 0, bot_z0), (0, 0, bot_z1), HUB),
+        box(0, cr_x1, -HUB, cr_y1, bot_z0, bot_z1),  # stays below the femur servo's ears
+        box(cr_x0, cr_x1, cr_y0, cr_y1, bot_z0, bot_z1),
+    )
+    cut(bot_arm, cyl((0, 0, bot_z1 - BW), (0, 0, bot_z1 + 1), BOD / 2))
+    cut(bot_arm, cyl((0, 0, bot_z0 - 1), (0, 0, bot_z1), BID / 2 + 0.6))
+    column = box(cr_x0, cr_x0 + WALL, cr_y0, cr_y1, bot_z0, top_z1)
+    # femur servo pocket must stay clear in the column/arms region
+    coxa_bracket = uni(fc, top_arm, bot_arm, column)
+    cut(coxa_bracket, box(cr_x0 + WALL, cr_x1 - WALL, cr_y0 + WALL, 60, -(SL - SO) - C, SO + C))
+
+    # ---------- femur ----------
+    def driven_arms(axis_x, length, half_w):
+        """Horn-side arm (bolted to the horn) and idler-side arm (bearing) around a y-axis
+        joint at (axis_x, 0), both extending +x for `length`."""
+        horn_arm = uni(
+            cyl((axis_x, arm_y0, 0), (axis_x, arm_y1, 0), HUB),
+            box(axis_x, axis_x + length, arm_y0, arm_y1, -half_w, half_w),
+        )
+        cut(horn_arm, *horn_holes((axis_x, arm_y0 - 1, 0), "y", ARM + 2))
+        idl_arm = uni(
+            cyl((axis_x, idl_y0, 0), (axis_x, idl_y1, 0), HUB),
+            box(axis_x, axis_x + length, idl_y0, idl_y1, -half_w, half_w),
+        )
+        cut(idl_arm, cyl((axis_x, idl_y1 - BW, 0), (axis_x, idl_y1 + 1, 0), BOD / 2))
+        cut(idl_arm, cyl((axis_x, idl_y0 - 1, 0), (axis_x, idl_y1, 0), BID / 2 + 0.6))
+        return horn_arm, idl_arm
+
+    kc = cradle(*knee_servo_frame)
+    kc_x0 = knee_x - (SL - SO) - o  # knee cradle's hip-side edge (servo body points to the hip)
+    f_horn, f_idl = driven_arms(LC, kc_x0 - LC + 1, 10.0)
+    bridge = box(kc_x0 - 10, kc_x0 + 1, idl_y0, arm_y1, -10, 10)
+    femur = uni(f_horn, f_idl, bridge, kc)
+    # clearance above the knee servo's hip-side ears (and screw-head access)
+    ear_x0 = knee_x - (ear_cx + EL / 2)
+    cut(femur, box(ear_x0 - GAP, kc_x0 + 1.5, -SH / 2 + EZ, 60, -SW / 2 - C - 0.5, SW / 2 + C + 0.5))
+    # keep the knee servo pocket clear of the bridge
+    cut(femur, box(knee_x - SL + SO - C, knee_x + SO + C, -SH / 2 - C, 60, -SW / 2 - C, SW / 2 + C))
+
+    # ---------- tibia ----------
+    t_horn, t_idl = driven_arms(knee_x, 38.0, 10.0)
+    t_bridge = box(knee_x + 30, knee_x + 42, idl_y0, arm_y1, -10, 10)
+    tip_r = 6.0
+    spine = cone((knee_x + 36, 0, 0), 10.0, (knee_x + LT - tip_r, 0, 0), tip_r)
+    foot = sphere((knee_x + LT - tip_r, 0, 0), tip_r)
+    tibia = uni(t_horn, t_idl, t_bridge, spine, foot)
+
+    # ---------- fit coupon (separate printable part, placed beside the leg) ----------
+    coupon = cradle((0, -120, 0), (0, 0, 1), (1, 0, 0))
+    cp = uni(
+        coupon,
+        box(-15, 40, -150, -138, -SH - C - WALL, -SH - C - WALL + 5),
+    )
+    cut(cp, cyl((5, -144, -SH - 20), (5, -144, 0), BOD / 2))  # bearing seat test (through)
+    for h in horn_holes((25, -144, -SH - 20), "z", 40):
+        cut(cp, h)
+
+    # ---------- write into Fusion ----------
+    leg_occ = next(o for o in root.occurrences if o.component.name == "Leg")
+    leg = leg_occ.component
+    for j in list(leg.asBuiltJoints) + list(leg.joints):
+        j.deleteMe()
+    for occ in list(leg.occurrences):
+        occ.deleteMe()
+    for o2 in list(root.occurrences):
+        if o2.component.name == "FitCoupon":
+            o2.deleteMe()
+
+    lib = app.materialLibraries.itemByName("Fusion Appearance Library")
+    base = None
+    for i in range(lib.appearances.count):
+        a = lib.appearances.item(i)
+        if "Plastic" in a.name and "Glossy" in a.name:
+            base = a
+            break
+
+    def appearance(name, rgb):
+        a = design.appearances.itemByName(name)
+        if a:
+            return a
+        a = design.appearances.addByCopy(base, name)
+        for prop in a.appearanceProperties:
+            if prop.objectType == adsk.core.ColorProperty.classType() and prop.id == "opaque_albedo":
+                prop.value = adsk.core.Color.create(*rgb, 255)
+        return a
+
+    colors = {
+        "blue": appearance("Rocky Blue", (30, 90, 200)),
+        "white": appearance("Rocky White", (235, 235, 230)),
+        "black": appearance("Rocky Black", (30, 30, 32)),
+        "grey": appearance("Rocky Grey", (120, 120, 125)),
+        "silver": appearance("Rocky Silver", (190, 190, 195)),
+    }
+
+    def add_component(parent, name, bodies):
+        occ = parent.occurrences.addNewComponent(adsk.core.Matrix3D.create())
+        comp = occ.component
+        comp.name = name
+        bf = comp.features.baseFeatures.add()
+        bf.startEdit()
+        for bname, tb, color in bodies:
+            b = comp.bRepBodies.add(tb, bf)
+            b.name = bname
+            b.appearance = colors[color]
+        bf.finishEdit()
+        return occ
+
+    servo_occ = add_component(
+        leg, "CoxaServo", [("BOUGHT_MG996R_coxa", servo(*coxa_servo_frame), "grey")]
+    )
+    coxa_occ = add_component(
+        leg,
+        "Coxa",
+        [
+            ("Coxa", coxa_bracket, "black"),
+            ("BOUGHT_MG996R_femur", servo(*femur_servo_frame), "grey"),
+            ("BOUGHT_horn_coxa", horn(*coxa_servo_frame), "silver"),
+            ("BOUGHT_bearing_coxa", bearing((0, 0, bot_z1 - BW), (0, 0, bot_z1)), "silver"),
+        ],
+    )
+    femur_occ = add_component(
+        leg,
+        "Femur",
+        [
+            ("Femur", femur, "blue"),
+            ("BOUGHT_MG996R_knee", servo(*knee_servo_frame), "grey"),
+            ("BOUGHT_horn_femur", horn(*femur_servo_frame), "silver"),
+            ("BOUGHT_bearing_femur", bearing((LC, idl_y1 - BW, 0), (LC, idl_y1, 0)), "silver"),
+        ],
+    )
+    tibia_occ = add_component(
+        leg,
+        "Tibia",
+        [
+            ("Tibia", tibia, "blue"),
+            ("BOUGHT_horn_knee", horn(*knee_servo_frame), "silver"),
+            ("BOUGHT_bearing_knee", bearing((knee_x, idl_y1 - BW, 0), (knee_x, idl_y1, 0)), "silver"),
+        ],
+    )
+    coupon_occ = add_component(root, "FitCoupon", [("FitCoupon", cp, "white")])
+    coupon_occ.isLightBulbOn = False
+
+    # ---------- joints (axes on the skeleton) ----------
+    sk = leg.sketches.itemByName("joints")
+    if sk:
+        sk.deleteMe()
+    sk = leg.sketches.add(leg.xYConstructionPlane)
+    sk.name = "joints"
+    pts = {
+        "coxa": sk.sketchPoints.add(Pt(0, 0, 0)),
+        "femur": sk.sketchPoints.add(Pt(LC * MM, 0, 0)),
+        "knee": sk.sketchPoints.add(Pt(knee_x * MM, 0, 0)),
+    }
+    J = adsk.fusion.JointDirections
+
+    def revolute(name, occ1, occ2, point, direction, lo_hi):
+        ji = leg.asBuiltJoints.createInput(occ1, occ2, adsk.fusion.JointGeometry.createByPoint(point))
+        ji.setAsRevoluteJointMotion(direction)
+        j = leg.asBuiltJoints.add(ji)
+        j.name = name
+        lim = j.jointMotion.rotationLimits
+        lim.isMinimumValueEnabled = True
+        lim.isMaximumValueEnabled = True
+        lim.minimumValue, lim.maximumValue = lo_hi
+        return j
+
+    import math
+
+    def fusion_range(lo_param, hi_param, flip):
+        lo, hi = P[lo_param], P[hi_param]
+        return (-hi, -lo) if flip else (lo, hi)
+
+    # coxa: +z, same sign as the code. femur/knee: code axis is -y, Fusion's is +y -> flip.
+    revolute("coxa", coxa_occ, servo_occ, pts["coxa"], J.ZAxisJointDirection,
+             fusion_range("coxa_min_deg", "coxa_max_deg", False))
+    revolute("femur", femur_occ, coxa_occ, pts["femur"], J.YAxisJointDirection,
+             fusion_range("femur_min_deg", "femur_max_deg", True))
+    revolute("knee", tibia_occ, femur_occ, pts["knee"], J.YAxisJointDirection,
+             fusion_range("tibia_min_deg", "tibia_max_deg", True))
+    print("leg built:", [o.component.name for o in leg.occurrences], "joints", leg.asBuiltJoints.count,
+          "deg", round(math.degrees(P["tibia_min_deg"]), 1))
