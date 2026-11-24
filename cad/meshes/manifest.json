@@ -102,6 +102,16 @@
       "color": "blue"
     },
     {
+      "file": "Tibia__FootCap.stl",
+      "segment": "tibia",
+      "origin_mm": [
+        110.0,
+        0,
+        0
+      ],
+      "color": "black"
+    },
+    {
       "file": "Tibia__BOUGHT_horn_knee.stl",
       "segment": "tibia",
       "origin_mm": [
@@ -142,16 +152,6 @@
       "color": "black"
     },
     {
-      "file": "Chassis__BatteryTray.stl",
-      "segment": "torso",
-      "origin_mm": [
-        0,
-        0,
-        0
-      ],
-      "color": "black"
-    },
-    {
       "file": "Deck__Deck.stl",
       "segment": "torso",
       "origin_mm": [
@@ -172,7 +172,107 @@
       "color": "white"
     },
     {
+      "file": "SidePanels__SidePanel_1.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "white"
+    },
+    {
+      "file": "SidePanels__SidePanel_2.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "white"
+    },
+    {
+      "file": "SidePanels__SidePanel_3.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "white"
+    },
+    {
+      "file": "SidePanels__SidePanel_4.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "white"
+    },
+    {
+      "file": "SidePanels__SidePanel_5.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "white"
+    },
+    {
+      "file": "Belly__Belly.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "white"
+    },
+    {
+      "file": "Belly__BellyHatch.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "black"
+    },
+    {
       "file": "Electronics__BOUGHT_pi5.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_respeaker.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_speaker.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_camera.stl",
       "segment": "torso",
       "origin_mm": [
         0,
@@ -192,26 +292,6 @@
       "color": "grey"
     },
     {
-      "file": "Electronics__BOUGHT_ubec.stl",
-      "segment": "torso",
-      "origin_mm": [
-        0,
-        0,
-        0
-      ],
-      "color": "grey"
-    },
-    {
-      "file": "Electronics__BOUGHT_buck.stl",
-      "segment": "torso",
-      "origin_mm": [
-        0,
-        0,
-        0
-      ],
-      "color": "grey"
-    },
-    {
       "file": "Electronics__BOUGHT_lipo.stl",
       "segment": "torso",
       "origin_mm": [
@@ -222,7 +302,147 @@
       "color": "grey"
     },
     {
-      "file": "Electronics__BOUGHT_camera.stl",
+      "file": "Electronics__BOUGHT_xl4005.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_ina219.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_fuse.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_switch.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_port.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_ubec_1.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_ubec_2.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_ubec_3.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_ubec_4.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_ubec_5.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_servo_board_1.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_servo_board_2.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_servo_board_3.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_servo_board_4.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "grey"
+    },
+    {
+      "file": "Electronics__BOUGHT_servo_board_5.stl",
       "segment": "torso",
       "origin_mm": [
         0,

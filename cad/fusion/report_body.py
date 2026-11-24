@@ -82,6 +82,10 @@ def run(_context: str):
             printed[b.name] = {"bbox_mm": [round(d, 2) for d in dims],
                                "volume_mm3": round(b.volume * 1000, 1)}
     report["printed"] = printed
+    report["components"] = sorted(
+        b.name[len("BOUGHT_"):] for occ in body_occ.childOccurrences for b in occ.bRepBodies
+        if b.name.startswith("BOUGHT_")
+    )
     t = leg_occs[0].transform2.translation
     report["coxa_axis_radius_mm"] = round(math.hypot(t.x, t.y) * 10, 4)
     chassis = next(o for o in body_occ.childOccurrences if o.component.name == "Chassis")

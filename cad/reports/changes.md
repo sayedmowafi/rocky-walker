@@ -28,3 +28,21 @@ torque wave 73.4 %, star 90.2 % of the rule (unchanged — walking never used th
 
 The sim now uses each segment's measured mass at its measured centre of mass (thin-rod inertia).
 Torque re-check: **wave 59.0 %**, **star 70.4 %**, dance routine 56 % of the rule (was 73.4 % / 90.2 % with the estimates).
+
+## Fit pass (2026-11-24): every bought part modelled, body enclosed
+
+All parts from `docs/bom.md` are now modelled at listing/datasheet sizes (**provisional until measured with calipers**) and included in the collision check, with all five legs swung to their hip limits. Result: **no collisions**; every printed part fits a 180 mm bed.
+
+| Level | What lives there |
+|---|---|
+| Carapace (taller, faceted, z 29–94) | Pi 5 + Active Cooler on the deck; ReSpeaker Lite on posts above it (mic holes in the roof); speaker beside it (grille in the roof); Camera Module 3 behind a window in the wall |
+| Mezzanine (top plate → deck) | PCA9685 |
+| Basement (between the plates) | 5 servo boards, one per leg, which the servos plug into |
+| Belly (new, with screw-on hatch) | 2S LiPo, 5 UBECs, XL4005, INA219, fuse holder; power switch and balance-charge port in the belly wall |
+| Side panels (5, new) | Close the gaps between the legs; hidden vent slots; notched where the plates pass through |
+
+Other changes:
+- Plate core radius 46 → 62 mm; plate spacers moved onto the leg axes; deck pillars moved to the sector midlines.
+- Deck radius 56 → 65.5 mm. The battery tray is gone; the battery sits on the belly hatch, strapped through two slots.
+- **TPU foot caps:** the printed tibia tip is 2.5 mm shorter and the cap restores the full 100 mm, so the walking maths is unchanged.
+- **Mass: 1.694 → 2.039 kg** (enclosure + all electronics). Torque re-check: **wave 73.0 %, star 87.4 %, dance 70 %** of the rule. Still within budget.

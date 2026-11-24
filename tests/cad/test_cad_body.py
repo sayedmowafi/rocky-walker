@@ -15,12 +15,37 @@ def report():
     return json.loads(REPORT.read_text())
 
 
+PRINTED = {"ChassisTop", "ChassisBottom", "Deck", "Carapace", "Belly", "BellyHatch"} | {
+    f"SidePanel_{i}" for i in range(1, 6)
+}
+# every part in docs/bom.md that lives in the body
+COMPONENTS = (
+    {
+        "pi5",
+        "camera",
+        "respeaker",
+        "speaker",
+        "pca9685",
+        "lipo",
+        "xl4005",
+        "ina219",
+        "fuse",
+        "switch",
+        "port",
+    }
+    | {f"ubec_{i}" for i in range(1, 6)}
+    | {f"servo_board_{i}" for i in range(1, 6)}
+)
+
+
 def test_body_parts_fit_bed(report):
-    assert {"ChassisTop", "ChassisBottom", "Deck", "Carapace", "BatteryTray"} <= set(
-        report["printed"]
-    )
+    assert set(report["printed"]) == PRINTED
     for name, part in report["printed"].items():
         assert max(part["bbox_mm"]) <= 180, f"{name} is {part['bbox_mm']} mm"
+
+
+def test_every_component_is_modelled(report):
+    assert set(report["components"]) == COMPONENTS
 
 
 def test_body_no_interference(report):

@@ -51,8 +51,8 @@ def run(_context: str):
     deck_z0 = 26.0
     deck_z1 = deck_z0 + WALL
     LOBE = 22.0  # plate lobe radius around each coxa axis (coxa bracket swings at >= 26.85)
-    CORE = 46.0  # plate core radius
-    DECK_R = 56.0
+
+
 
     tbm = adsk.fusion.TemporaryBRepManager.get()
     V = adsk.core.Vector3D.create
@@ -116,15 +116,46 @@ def run(_context: str):
 
     ear_holes = [(-(ear_cx + sx * EP / 2), sy * EG / 2) for sx in (-1, 1) for sy in (-1, 1)]
 
+    def pbox(a, u0, u1, v0, v1, z0, z1):
+        """Box in a local frame rotated by angle a about z (u radial, v tangential)."""
+        ca, sa = math.cos(a), math.sin(a)
+        uc, vc = (u0 + u1) / 2, (v0 + v1) / 2
+        c = (uc * ca - vc * sa, uc * sa + vc * ca, (z0 + z1) / 2)
+        return obox(c, (ca, sa, 0), (-sa, ca, 0), u1 - u0, v1 - v0, z1 - z0)
+
+    def ppt(a, u, v):
+        return (u * math.cos(a) - v * math.sin(a), u * math.sin(a) + v * math.cos(a))
+
+    def pcyl(a, u, v, z0, z1, r):
+        x, y = ppt(a, u, v)
+        return cyl((x, y, z0), (x, y, z1), r)
+
+    def plane_slab(n, d, thick=100, size=400):
+        """Half-space slab whose inner face is the plane n.p = d (keeps n.p < d after a cut)."""
+        c = tuple(n[i] * (d + thick / 2) for i in range(3))
+        nd = V(*n)
+        xd = V(1, 0, 0) if abs(n[0]) < 0.9 else V(0, 1, 0)
+        u = nd.crossProduct(xd)
+        u.normalize()
+        w = nd.crossProduct(u)
+        w.normalize()
+        return obox(c, (u.x, u.y, u.z), (w.x, w.y, w.z), size, size, thick)
+
+    SEC = [p + math.pi / N for p in PSI]  # sector mid-angles, between the legs
+    CORE = 62.0  # plate core radius (reaches the side panels between the legs)
+    SPACER_R = 26.0  # plate spacers, on the leg axes (inside the coxa servos' inner ends)
+    DECK_PILLAR_R = 56.0  # deck pillars, on the sector midlines
+    DECK_R = 65.5
+    PANEL_R0, PANEL_R1 = 62.5, 65.0
+    PANEL_HALF = math.radians(36 - 13.6)  # panels stop 13.6 deg short of each leg axis
+    cam_a = math.pi / N  # camera / battery / belly reference direction (sector 0)
+
     def plate(z0, z1):
         p = cyl((0, 0, z0), (0, 0, z1), CORE)
         for i in range(N):
             lobe = uni(cyl((0, 0, z0), (0, 0, z1), LOBE), box(-30, 0, -LOBE, LOBE, z0, z1))
             tbm.booleanOperation(p, at_leg(lobe, i), UNION)
         return p
-
-    pillar_angles = [p + math.pi / N for p in PSI]  # between the legs
-    PILLAR_R = 44.0
 
     # ---------- top plate ----------
     top = plate(top_z0, top_z1)
@@ -133,143 +164,213 @@ def run(_context: str):
         for hx, hy in ear_holes:
             cut(top, at_leg(cyl((hx, hy, top_z0 - 1), (hx, hy, top_z1 + 1), M3 / 2), i))
             cut(top, at_leg(hexnut(hx, hy, top_z0 - 0.01, NT), i))
-    for a in pillar_angles:
-        px, py = PILLAR_R * math.cos(a), PILLAR_R * math.sin(a)
-        cut(top, cyl((px, py, top_z0 - 1), (px, py, top_z1 + 1), M3 / 2))
-        cut(top, hexnut(px, py, top_z0 - 0.01, NT))
+        cut(top, pcyl(PSI[i], SPACER_R, 0, top_z0 - 1, top_z1 + 1, M3 / 2))  # spacer screw
+        cut(top, pcyl(SEC[i], DECK_PILLAR_R, 0, top_z0 - 1, top_z1 + 1, M3 / 2))  # deck pillar
+        x, y = ppt(SEC[i], DECK_PILLAR_R, 0)
+        cut(top, hexnut(x, y, top_z0 - 0.01, NT))
+        for s_ in (-1, 1):  # side-panel tab holes
+            x, y = ppt(SEC[i] + s_ * math.radians(12), 59.5, 0)
+            cut(top, cyl((x, y, top_z0 - 1), (x, y, top_z1 + 1), M3 / 2))
+            cut(top, hexnut(x, y, top_z0 - 0.01, NT))
+        x, y = ppt(SEC[i], 40, 0)  # wire pass-through to the mezzanine
+        cut(top, pbox(SEC[i], 34, 46, -6, 6, top_z0 - 1, top_z1 + 1))
+    cut(top, cyl((0, 0, top_z0 - 1), (0, 0, top_z1 + 1), 8))  # central wire hole
 
-    # ---------- bottom plate ----------
+    # ---------- bottom plate (+ spacers) ----------
     bottom = plate(bot_z0, bot_z1)
     for i in range(N):
         cut(bottom, at_leg(cyl((0, 0, bot_z0 - 1), (0, 0, bot_z1 + 1), M3 / 2), i))  # coxa idler
         cut(bottom, at_leg(hexnut(0, 0, bot_z1 - NT + 0.01, NT), i))
-    # spacers between the plates (printed with the bottom plate), M3 through
-    for a in pillar_angles:
-        px, py = PILLAR_R * math.cos(a), PILLAR_R * math.sin(a)
-        sp = cyl((px, py, bot_z1), (px, py, top_z0), 4.5)
-        tbm.booleanOperation(bottom, sp, UNION)
-        cut(bottom, cyl((px, py, bot_z0 - 1), (px, py, top_z0 + 1), M3 / 2))
-    # battery strap slots
-    for sx in (-1, 1):
-        cut(bottom, obox((sx * 30 * math.cos(math.pi / N), sx * 30 * math.sin(math.pi / N),
-                          (bot_z0 + bot_z1) / 2),
-                         (-math.sin(math.pi / N), math.cos(math.pi / N), 0),
-                         (math.cos(math.pi / N), math.sin(math.pi / N), 0), 22, 4, WALL + 2))
+        tbm.booleanOperation(bottom, pcyl(PSI[i], SPACER_R, 0, bot_z1, top_z0, 4.5), UNION)
+        cut(bottom, pcyl(PSI[i], SPACER_R, 0, bot_z0 - 1, top_z0 + 1, M3 / 2))
+        x, y = ppt(PSI[i], SPACER_R, 0)
+        cut(bottom, hexnut(x, y, bot_z0 - 0.01, NT))
+        x, y = ppt(PSI[i], 35, 0)  # belly screws
+        cut(bottom, cyl((x, y, bot_z0 - 1), (x, y, bot_z1 + 1), M3 / 2))
+        cut(bottom, hexnut(x, y, bot_z1 - NT + 0.01, NT))
+        for s_ in (-1, 1):  # side-panel tab holes
+            x, y = ppt(SEC[i] + s_ * math.radians(12), 59.5, 0)
+            cut(bottom, cyl((x, y, bot_z0 - 1), (x, y, bot_z1 + 1), M3 / 2))
+            cut(bottom, hexnut(x, y, bot_z1 - NT + 0.01, NT))
+        cut(bottom, pbox(SEC[i], 18, 24, -5, 5, bot_z0 - 1, bot_z1 + 1))  # belly wire slot
+    cut(bottom, cyl((0, 0, bot_z0 - 1), (0, 0, bot_z1 + 1), 8))  # central wire hole
 
-    # ---------- deck + pillars ----------
+    # ---------- deck (+ pillars, Pi standoffs, ReSpeaker posts, camera tab) ----------
     deck = cyl((0, 0, deck_z0), (0, 0, deck_z1), DECK_R)
-    for a in pillar_angles:
-        px, py = PILLAR_R * math.cos(a), PILLAR_R * math.sin(a)
-        tbm.booleanOperation(deck, cyl((px, py, top_z1), (px, py, deck_z0), 4.5), UNION)
-        cut(deck, cyl((px, py, top_z1 - 1), (px, py, deck_z1 + 1), M3 / 2 - 0.4))  # self-tap
-    # Pi 5 standoffs (M2.5, 58 x 49 pattern), board centred
-    pi_holes = [(sx * 29, sy * 24.5) for sx in (-1, 1) for sy in (-1, 1)]
-    for hx, hy in pi_holes:
-        tbm.booleanOperation(deck, cyl((hx, hy, deck_z1), (hx, hy, deck_z1 + 5), 3), UNION)
-        cut(deck, cyl((hx, hy, deck_z0 - 1), (hx, hy, deck_z1 + 6), 1.1))
-    # cable pass-through
-    cut(deck, box(-12, 12, -40, -30, deck_z0 - 1, deck_z1 + 1))
+    for i in range(N):
+        tbm.booleanOperation(deck, pcyl(SEC[i], DECK_PILLAR_R, 0, top_z1, deck_z0, 4.5), UNION)
+        cut(deck, pcyl(SEC[i], DECK_PILLAR_R, 0, top_z1 - 1, deck_z1 + 1, M3 / 2))
+    cut(deck, cyl((0, 0, deck_z0 - 1), (0, 0, deck_z1 + 1), 8))  # wires up from the belly
+    # deck frame: x' along cam_a (toward the camera), y' perpendicular
+    PI_X = -14.0
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            x, y = ppt(cam_a, PI_X + sx * 24.5, sy * 29)
+            tbm.booleanOperation(deck, cyl((x, y, deck_z1), (x, y, deck_z1 + 5), 3), UNION)
+            cut(deck, cyl((x, y, deck_z0 - 1), (x, y, deck_z1 + 6), 1.1))
+    RS_Z = deck_z1 + 25.0  # ReSpeaker Lite board underside, above the Pi and its cooler
+    for sy in (-1, 1):  # posts just outside the Pi, with ledges over the Pi's ports
+        lo, hi = (45.5, 50.5) if sy > 0 else (-50.5, -45.5)
+        llo, lhi = (42.0, 50.5) if sy > 0 else (-50.5, -42.0)
+        post = uni(pbox(cam_a, PI_X - 5, PI_X + 5, lo, hi, deck_z1, RS_Z),
+                   pbox(cam_a, PI_X - 8, PI_X + 8, llo, lhi, RS_Z - 2, RS_Z))
+        tbm.booleanOperation(deck, post, UNION)
+    # camera tab (inside the carapace, lens through the wall)
+    CAM_Z = deck_z1 + 17.0
+    tbm.booleanOperation(deck, pbox(cam_a, 47, 50, -14, 14, deck_z1, deck_z1 + 30), UNION)
+    for sx, sy in ((-10.5, 6.25), (10.5, 6.25), (-10.5, -6.25), (10.5, -6.25)):
+        x, y = ppt(cam_a, 46, sx)
+        x2, y2 = ppt(cam_a, 51, sx)
+        cut(deck, cyl((x, y, CAM_Z + sy), (x2, y2, CAM_Z + sy), 1.1))
 
-    # ---------- faceted carapace ----------
-    DOME_R, DOME_WALL = 62.0, 2.4
-    dome_c = (0, 0, deck_z1 - 14)
-    outer = sphere(dome_c, DOME_R)
-    inner = sphere(dome_c, DOME_R - DOME_WALL)
-    keep_up = box(-100, 100, -100, 100, deck_z1, 200)
-    tbm.booleanOperation(outer, keep_up, INTER)
-    tbm.booleanOperation(inner, box(-100, 100, -100, 100, deck_z1 - 1, 200), INTER)
-    # facets: cut by planes with deterministic, irregular normals (a rough, rock-like look)
+    # ---------- carapace: faceted wall + dome, camera window, speaker grille, mic holes ----------
+    CA, CC, CZ, CW = 65.5, 38.0, 56.0, 2.5  # outer horizontal / vertical radius, dome centre z, wall
+
+    def capsule(a, c, grow=0.0):
+        """Vertical wall of radius a up to CZ, capped by the sphere through the rim and CZ + c."""
+        rs = (a * a + c * c) / (2 * c)
+        cap = sphere((0, 0, CZ + c - rs), rs)
+        tbm.booleanOperation(cap, box(-200, 200, -200, 200, CZ, CZ + c + 5), INTER)
+        return uni(cap, cyl((0, 0, deck_z1 - grow), (0, 0, CZ + 0.01), a))
+
+    RS_O = (CA * CA + CC * CC) / (2 * CC)
+    Z0_O = CZ + CC - RS_O
+
+    outer = capsule(CA, CC)
+    inner = capsule(CA - CW, CC - CW, grow=1)
     facets = []
-    for k in range(17):
-        az = math.radians(k * 137.5 % 360)  # golden-angle spread
-        el = math.radians(18 + (k * 23) % 55)
+    for k in range(19):
+        az = math.radians(k * 137.5 % 360)
+        el = math.radians([4, 12, 22, 35, 50][k % 5])
         n = (math.cos(el) * math.cos(az), math.cos(el) * math.sin(az), math.sin(el))
-        d = DOME_R - 2.5 - (k * 7 % 5) * 0.6
-        facets.append((n, d))
-    facets.append(((0, 0, 1), DOME_R - 6))  # flat-ish top
-    def facet_slab(n, d):
-        c = tuple(dome_c[i] + n[i] * (d + 50) for i in range(3))
-        # a 100 mm-thick slab whose inner face is the plane n.p = d
-        x = (1, 0, 0) if abs(n[0]) < 0.9 else (0, 1, 0)
-        xd = V(*x)
-        nd = V(*n)
-        u = nd.crossProduct(xd)
-        u.normalize()
-        w = nd.crossProduct(u)
-        w.normalize()
-        return obox(c, (u.x, u.y, u.z), (w.x, w.y, w.z), 300, 300, 100)
-
+        if n[2] < (CZ - Z0_O) / RS_O:  # support point on the wall / rim
+            h = CA * math.sqrt(1 - n[2] ** 2) + CZ * n[2]
+        else:  # support point on the dome
+            h = RS_O + Z0_O * n[2]
+        depth = (1.0 + (k * 7 % 4) * 0.5) if el < math.radians(30) else (2.0 + (k * 7 % 5) * 0.4)
+        facets.append((n, h - depth))
+    facets.append(((0, 0, 1), CZ + CC - 5))
     for n, d in facets:
-        tbm.booleanOperation(outer, facet_slab(n, d), CUT)
-        tbm.booleanOperation(inner, facet_slab(n, d - DOME_WALL), CUT)  # same facets, offset in
+        tbm.booleanOperation(outer, plane_slab(n, d), CUT)
+        tbm.booleanOperation(inner, plane_slab(n, d - CW), CUT)
     tbm.booleanOperation(outer, inner, CUT)
     shell = outer
-    # rim screws into the deck edge
-    rim_r = DECK_R - 9
-    for a in pillar_angles:
-        x, y = rim_r * math.cos(a), rim_r * math.sin(a)
-        tbm.booleanOperation(shell, cyl((x, y, deck_z1), (x, y, deck_z1 + 3.5), 3.5), UNION)
-        cut(shell, cyl((x, y, deck_z1 - 1), (x, y, deck_z1 + 4.5), 1.3))
-        cut(deck, cyl((x, y, deck_z0 - 1), (x, y, deck_z1 + 1), M3 / 2))
+    for i in range(N):  # rim screw bosses into the deck (20 deg off the deck pillars)
+        a = SEC[i] + math.radians(20)
+        tbm.booleanOperation(shell, pcyl(a, 60.0, 0, deck_z1, deck_z1 + 5, 3.5), UNION)
+        tbm.booleanOperation(shell, pbox(a, 60, 64, -3.5, 3.5, deck_z1, deck_z1 + 5), UNION)
+        cut(shell, pcyl(a, 60.0, 0, deck_z1 - 1, deck_z1 + 6, 1.3))
+        cut(deck, pcyl(a, 60.0, 0, deck_z0 - 1, deck_z1 + 1, M3 / 2))
+    x, y = ppt(cam_a, 50, 0)
+    x2, y2 = ppt(cam_a, 75, 0)
+    cut(shell, cyl((x, y, CAM_Z), (x2, y2, CAM_Z), 5.5))  # camera window
+    SPK_U, SPK_V = 30.0, -19.0  # speaker centre in the deck frame
+    for gu, gv in [(0, 0)] + [(7 * math.cos(math.radians(60 * j)), 7 * math.sin(math.radians(60 * j)))
+                              for j in range(6)]:
+        x, y = ppt(cam_a, SPK_U + gu, SPK_V + gv)
+        cut(shell, cyl((x, y, deck_z1 + 20), (x, y, 120), 1.6))  # speaker grille
+    for sy in (-1, 1):  # mic holes above the ReSpeaker's two mics (provisional positions)
+        x, y = ppt(cam_a, PI_X, sy * 36)
+        cut(shell, cyl((x, y, RS_Z), (x, y, 120), 1.5))
 
-    # camera: Camera Module 3 on a vertical tab at the deck's front edge between legs 0 and 1,
-    # just outside the carapace, looking straight out (horizontal).
-    cam_a = math.pi / N
-    out_dir = (math.cos(cam_a), math.sin(cam_a), 0)
-    side = (-math.sin(cam_a), math.cos(cam_a), 0)
-    TAB_R0, TAB_T = 63.0, 3.0  # tab inner radius, thickness
-    tab_h = 28.0
-    tab_c = tuple(out_dir[i] * (TAB_R0 + TAB_T / 2) for i in range(2)) + (deck_z1 + tab_h / 2,)
-    tab = obox(tab_c, out_dir, side, TAB_T, 28, tab_h)
-    tongue = obox(tuple(out_dir[i] * (DECK_R + TAB_R0) / 2 for i in range(2)) + ((deck_z0 + deck_z1) / 2,),
-                  out_dir, side, TAB_R0 - DECK_R + TAB_T + 2, 24, WALL)
-    tbm.booleanOperation(deck, uni(tab, tongue), UNION)
-    cam_c = tuple(out_dir[i] * (TAB_R0 + TAB_T) for i in range(2)) + (deck_z1 + 15,)
-    up = (0, 0, 1)
-    for sx, sy in ((-10.5, 6.25), (10.5, 6.25), (-10.5, -6.25), (10.5, -6.25)):
-        p0 = tuple(cam_c[i] + side[i] * sx + up[i] * sy - out_dir[i] * (TAB_T + 1) for i in range(3))
-        p1 = tuple(cam_c[i] + side[i] * sx + up[i] * sy + out_dir[i] * 1 for i in range(3))
-        cut(deck, cyl(p0, p1, 1.1))
-    camera = obox(tuple(cam_c[i] + out_dir[i] * 1.5 for i in range(3)), out_dir, side, 3, 25, 24)
-    lens_p1 = tuple(cam_c[i] + out_dir[i] * 11.5 for i in range(3))
-    tbm.booleanOperation(camera, cyl(cam_c, lens_p1, 4), UNION)
+    # ---------- side panels (5, identical), between the legs ----------
+    panels = []
+    for i in range(N):
+        a = SEC[i]
+        wedge = cyl((0, 0, bot_z0 - 3), (0, 0, deck_z0), PANEL_R1 + 3)
+        for s_ in (-1, 1):  # keep between a +- PANEL_HALF
+            ang = a + s_ * PANEL_HALF
+            nx, ny = -math.sin(ang) * s_, math.cos(ang) * s_
+            tbm.booleanOperation(wedge, plane_slab((nx, ny, 0), 0), CUT)
+        for k, off in enumerate((-15, 0, 15)):  # three flat facets outside
+            ang = a + math.radians(off)
+            tbm.booleanOperation(wedge, plane_slab((math.cos(ang), math.sin(ang), 0),
+                                                   PANEL_R1 - (0.6 if off else 0.0)), CUT)
+        cut(wedge, cyl((0, 0, bot_z0 - 4), (0, 0, deck_z0 + 1), PANEL_R0))
+        for s_ in (-1, 1):  # inward tabs onto the top plate and under the bottom plate
+            for z0, z1 in ((top_z1, top_z1 + 3), (bot_z0 - 3, bot_z0)):
+                ang = a + s_ * math.radians(12)
+                tab = pbox(ang, 56.5, PANEL_R0 + 0.5, -4, 4, z0, z1)
+                cut(tab, pcyl(ang, 59.5, 0, z0 - 1, z1 + 1, M3 / 2))
+                tbm.booleanOperation(wedge, tab, UNION)
+        for i2 in range(N):  # notches where the plates' lobes pass through the panel ends
+            for z0, z1 in ((top_z0, top_z1), (bot_z0, bot_z1)):
+                notch = uni(cyl((0, 0, z0 - 0.3), (0, 0, z1 + 0.3), LOBE + 0.3),
+                            box(-30.3, 0, -LOBE - 0.3, LOBE + 0.3, z0 - 0.3, z1 + 0.3))
+                cut(wedge, at_leg(notch, i2))
+        for zc in (-18, -10, 10):  # hidden vent slots
+            cut(wedge, pbox(a, PANEL_R0 - 2, PANEL_R1 + 2, -12, 12, zc - 1.25, zc + 1.25))
+        panels.append(wedge)
 
-    # ---------- battery tray (under the bottom plate, long axis between legs 0 and 1) ----------
-    # Zeee 2S 2200 mAh 50C shorty, XT60 (73 x 34 x 18.5 mm, 98 g); tray leaves C all round
-    bat_l, bat_w, bat_h = 73.0, 34.0, 18.5
-    bat_dir = (math.cos(cam_a), math.sin(cam_a), 0)
-    bat_side = (-math.sin(cam_a), math.cos(cam_a), 0)
-    bat_top = bot_z0 - 1.0
-    battery = obox((0, 0, bat_top - bat_h / 2), bat_dir, bat_side, bat_l, bat_w, bat_h)
-    floor_top = bat_top - bat_h - C
-    tray_floor = obox((0, 0, floor_top - 1.5), bat_dir, bat_side, bat_l * 0.85, bat_w + 6, 3)
-    # tray hangs from the bottom plate on two walls along the battery's long sides
-    walls = [
-        obox(tuple(bat_side[i] * s * (bat_w / 2 + 1.5 + C) for i in range(2)) + ((bot_z0 + floor_top - 3) / 2,),
-             bat_dir, bat_side, bat_l * 0.85, 3, bot_z0 - (floor_top - 3))
-        for s in (-1, 1)
-    ]
-    tray = uni(tray_floor, *walls)
+    # ---------- belly (power bay) + hatch ----------
+    BU_R, BL_R, BW = 54.0, 70.0, 2.4  # upper ring / lower outer radius, wall
+    B_TOP, B_MID, B_FLOOR = bot_z0, -37.0, -62.0  # belly top, step, floor top (hatch top)
+    belly = uni(cyl((0, 0, B_MID), (0, 0, B_TOP), BU_R), cyl((0, 0, B_FLOOR), (0, 0, B_MID), BL_R))
+    b_in = uni(cyl((0, 0, B_MID - 0.5), (0, 0, B_TOP + 1), BU_R - BW),
+               cyl((0, 0, B_FLOOR - 1), (0, 0, B_MID), BL_R - BW))
+    for k in range(9):  # rock facets on the lower wall
+        az = math.radians(k * 137.5 % 360 + 11)
+        n = (math.cos(az), math.sin(az), 0)
+        depth = 1.0 + (k * 7 % 4) * 0.5
+        tbm.booleanOperation(belly, plane_slab(n, BL_R - depth), CUT)
+        tbm.booleanOperation(b_in, plane_slab(n, BL_R - depth - BW), CUT)
+    tbm.booleanOperation(belly, b_in, CUT)
+    for i in range(N):  # tabs up to the bottom plate screws
+        ang = PSI[i]
+        tab = uni(pbox(ang, 31, BU_R - 1, -5, 5, B_TOP - 3, B_TOP))
+        cut(tab, pcyl(ang, 35, 0, B_TOP - 4, B_TOP + 1, M3 / 2))
+        tbm.booleanOperation(belly, tab, UNION)
+    hatch = cyl((0, 0, B_FLOOR - 3), (0, 0, B_FLOOR), BL_R - BW - 0.3)
+    for k in range(9):
+        az = math.radians(k * 137.5 % 360 + 11)
+        n = (math.cos(az), math.sin(az), 0)
+        tbm.booleanOperation(hatch, plane_slab(n, BL_R - 1.0 - (k * 7 % 4) * 0.5 - BW - 0.3), CUT)
+    for deg in (20, 90, 160, 270):  # hatch screws into belly bosses
+        a = cam_a + math.radians(deg)
+        boss = pcyl(a, 62.5, 0, B_FLOOR, B_FLOOR + 8, 4.0)
+        tbm.booleanOperation(belly, uni(boss, pbox(a, 62.5, BL_R - 1, -4, 4, B_FLOOR, B_FLOOR + 8)), UNION)
+        cut(belly, pcyl(a, 62.5, 0, B_FLOOR - 1, B_FLOOR + 9, 1.3))
+        cut(hatch, pcyl(a, 62.5, 0, B_FLOOR - 4, B_FLOOR + 1, M3 / 2))
+    for sv in (-1, 1):  # battery strap slots in the hatch
+        cut(hatch, pbox(cam_a, sv * 22 - 2, sv * 22 + 2, 2, 48, B_FLOOR - 4, B_FLOOR + 1))
+    # switch (belly wall, 5 deg off the battery axis) and balance-charge port (opposite side)
+    SW_A, SW_Z = cam_a + math.radians(5), B_FLOOR + 12.0
+    x0, y0 = ppt(SW_A, BL_R - 6, 0)
+    x1, y1 = ppt(SW_A, BL_R + 2, 0)
+    cut(belly, cyl((x0, y0, SW_Z), (x1, y1, SW_Z), 9.7))
+    PORT_A, PORT_Z = cam_a + math.radians(185), B_FLOOR + 10.0
+    cut(belly, pbox(PORT_A, BL_R - 6, BL_R + 2, -6.5, 6.5, PORT_Z - 4, PORT_Z + 4))
 
-    # ---------- electronics placeholders ----------
-    pi5 = uni(box(-42.5, 42.5, -28, 28, deck_z1 + 5, deck_z1 + 6.6),
-              box(-15, 15, -15, 15, deck_z1 + 6.6, deck_z1 + 16))
-    pca = box(-31, 31, -12.5, 12.5, bot_z1, bot_z1 + 10)
-    ubec = box(-22.5, 22.5, -12.5, 12.5, top_z0 - 10, top_z0)
-    buck = box(-22.5, 22.5, -12.5, 12.5, top_z0 - 10, top_z0)
+    # ---------- electronics and other bought / hand-built parts ----------
+    def deck_box(u0, u1, v0, v1, z0, z1):
+        return pbox(cam_a, u0, u1, v0, v1, z0, z1)
 
-    def rotz(body, deg, dx=0.0, dy=0.0):
-        m = adsk.core.Matrix3D.create()
-        m.setToRotation(math.radians(deg), V(0, 0, 1), Pt(0, 0, 0))
-        t = adsk.core.Matrix3D.create()
-        t.translation = V(dx * MM, dy * MM, 0)
-        m.transformBy(t)
-        tbm.transform(body, m)
-        return body
-
-    rotz(pca, 36)
-    rotz(ubec, 36, -14 * math.sin(cam_a) * 1, 14 * math.cos(cam_a))
-    rotz(buck, 36, 14 * math.sin(cam_a), -14 * math.cos(cam_a))
+    pz = deck_z1 + 5
+    pi5 = uni(deck_box(PI_X - 28, PI_X + 28, -42.5, 42.5, pz, pz + 1.6),
+              deck_box(PI_X - 26.5, PI_X + 26.5, 21.5, 44.5, pz + 1.6, pz + 17.6),  # USB + Ethernet
+              deck_box(PI_X - 24, PI_X + 24, -30, 15, pz + 1.6, pz + 10.5))  # Active Cooler
+    respeaker = deck_box(PI_X - 17.5, PI_X + 17.5, -45, 45, RS_Z, RS_Z + 8.6)
+    speaker = deck_box(SPK_U - 15, SPK_U + 15, SPK_V - 21, SPK_V + 21, deck_z1, deck_z1 + 22)
+    camera = deck_box(50, 53, -12.5, 12.5, CAM_Z - 12, CAM_Z + 12)
+    x, y = ppt(cam_a, 53, 0)
+    x2, y2 = ppt(cam_a, 61.5, 0)
+    tbm.booleanOperation(camera, cyl((x, y, CAM_Z), (x2, y2, CAM_Z), 4), UNION)
+    pca = uni(pbox(SEC[0], -12, 50, -12.7, 12.7, top_z1 + 4, top_z1 + 5.6),
+              pbox(SEC[0], -3, 38, 5, 12.7, top_z1 + 5.6, top_z1 + 16.6))
+    boards = [uni(pbox(SEC[i], 27, 57, -11, 11, bot_z1 + 3, bot_z1 + 4.6),
+                  pbox(SEC[i], 29, 51, -8, 8, bot_z1 + 4.6, bot_z1 + 21.1)) for i in range(N)]
+    lipo = deck_box(-36.5, 36.5, 8, 42, B_FLOOR, B_FLOOR + 18.5)
+    ubecs = [deck_box(-44 + 9.5 * k, -44 + 9.5 * k + 8, -40, 2, B_FLOOR, B_FLOOR + 17) for k in range(5)]
+    xl4005 = deck_box(4, 58, -29, -6, B_FLOOR, B_FLOOR + 18)
+    ina219 = deck_box(10, 35, -26, -4, B_FLOOR + 20, B_FLOOR + 25)
+    fuse = deck_box(4, 40, -48, -30, B_FLOOR, B_FLOOR + 18)
+    x0, y0 = ppt(SW_A, BL_R - 32, 0)
+    x1, y1 = ppt(SW_A, BL_R - 1, 0)
+    switch = cyl((x0, y0, SW_Z), (x1, y1, SW_Z), 9.5)
+    x1, y1 = ppt(SW_A, BL_R + 2, 0)
+    xb, yb = ppt(SW_A, BL_R + 0.2, 0)
+    tbm.booleanOperation(switch, cyl((xb, yb, SW_Z), (x1, y1, SW_Z), 11), UNION)
+    port = pbox(PORT_A, BL_R - 16, BL_R - 1, -6, 6, PORT_Z - 3.5, PORT_Z + 3.5)
 
     # ---------- write into Fusion ----------
     body_occ = next(o for o in root.occurrences if o.component.name == "Body")
@@ -293,17 +394,16 @@ def run(_context: str):
         bf.finishEdit()
         return occ
 
-    add_component("Chassis", [("ChassisTop", top, "Rocky Black"), ("ChassisBottom", bottom, "Rocky Black"),
-                              ("BatteryTray", tray, "Rocky Black")])
+    add_component("Chassis", [("ChassisTop", top, "Rocky Black"), ("ChassisBottom", bottom, "Rocky Black")])
     add_component("Deck", [("Deck", deck, "Rocky Black")])
     add_component("Carapace", [("Carapace", shell, "Rocky White")])
-    add_component("Electronics", [
-        ("BOUGHT_pi5", pi5, "Rocky Grey"),
-        ("BOUGHT_pca9685", pca, "Rocky Grey"),
-        ("BOUGHT_ubec", ubec, "Rocky Grey"),
-        ("BOUGHT_buck", buck, "Rocky Grey"),
-        ("BOUGHT_lipo", battery, "Rocky Grey"),
-        ("BOUGHT_camera", camera, "Rocky Grey"),
-    ])
+    add_component("SidePanels", [(f"SidePanel_{i + 1}", panels[i], "Rocky White") for i in range(N)])
+    add_component("Belly", [("Belly", belly, "Rocky White"), ("BellyHatch", hatch, "Rocky Black")])
+    parts = [("BOUGHT_pi5", pi5), ("BOUGHT_respeaker", respeaker), ("BOUGHT_speaker", speaker),
+             ("BOUGHT_camera", camera), ("BOUGHT_pca9685", pca), ("BOUGHT_lipo", lipo),
+             ("BOUGHT_xl4005", xl4005), ("BOUGHT_ina219", ina219), ("BOUGHT_fuse", fuse),
+             ("BOUGHT_switch", switch), ("BOUGHT_port", port)]
+    parts += [(f"BOUGHT_ubec_{k + 1}", u) for k, u in enumerate(ubecs)]
+    parts += [(f"BOUGHT_servo_board_{k + 1}", b) for k, b in enumerate(boards)]
+    add_component("Electronics", [(n, b, "Rocky Grey") for n, b in parts])
     print("body built:", [o.component.name for o in comp.occurrences])
-

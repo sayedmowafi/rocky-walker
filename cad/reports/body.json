@@ -1,24 +1,55 @@
 {
   "chassis_height_mm": 32.3,
+  "components": [
+    "camera",
+    "fuse",
+    "ina219",
+    "lipo",
+    "pca9685",
+    "pi5",
+    "port",
+    "respeaker",
+    "servo_board_1",
+    "servo_board_2",
+    "servo_board_3",
+    "servo_board_4",
+    "servo_board_5",
+    "speaker",
+    "switch",
+    "ubec_1",
+    "ubec_2",
+    "ubec_3",
+    "ubec_4",
+    "ubec_5",
+    "xl4005"
+  ],
   "coxa_axis_radius_mm": 70.0,
   "coxa_sweep": {},
   "interference_neutral": [],
   "printed": {
-    "BatteryTray": {
+    "Belly": {
       "bbox_mm": [
-        74.06,
-        69.32,
-        22.8
+        140.0,
+        140.0,
+        31.8
       ],
-      "volume_mm3": 14929.2
+      "volume_mm3": 34970.9
+    },
+    "BellyHatch": {
+      "bbox_mm": [
+        134.6,
+        134.6,
+        3.0
+      ],
+      "volume_mm3": 40539.6
     },
     "Carapace": {
       "bbox_mm": [
-        118.41,
-        120.8,
-        42.0
+        131.0,
+        131.0,
+        60.0
       ],
-      "volume_mm3": 41307.7
+      "volume_mm3": 68413.5
     },
     "ChassisBottom": {
       "bbox_mm": [
@@ -26,7 +57,7 @@
         177.15,
         29.3
       ],
-      "volume_mm3": 54524.8
+      "volume_mm3": 57630.6
     },
     "ChassisTop": {
       "bbox_mm": [
@@ -34,15 +65,55 @@
         177.15,
         3.0
       ],
-      "volume_mm3": 33997.6
+      "volume_mm3": 35746.1
     },
     "Deck": {
       "bbox_mm": [
-        117.62,
-        112.0,
-        54.9
+        131.0,
+        131.0,
+        56.9
       ],
-      "volume_mm3": 39005.6
+      "volume_mm3": 51838.6
+    },
+    "SidePanel_1": {
+      "bbox_mm": [
+        30.37,
+        40.62,
+        59.2
+      ],
+      "volume_mm3": 6413.7
+    },
+    "SidePanel_2": {
+      "bbox_mm": [
+        47.07,
+        17.82,
+        59.2
+      ],
+      "volume_mm3": 6413.7
+    },
+    "SidePanel_3": {
+      "bbox_mm": [
+        10.57,
+        49.49,
+        59.2
+      ],
+      "volume_mm3": 6413.7
+    },
+    "SidePanel_4": {
+      "bbox_mm": [
+        47.07,
+        17.82,
+        59.2
+      ],
+      "volume_mm3": 6413.7
+    },
+    "SidePanel_5": {
+      "bbox_mm": [
+        30.37,
+        40.62,
+        59.2
+      ],
+      "volume_mm3": 6413.7
     }
   }
 }

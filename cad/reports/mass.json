@@ -71,23 +71,45 @@
     "BOUGHT_bearing_coxa": 0.002,
     "BOUGHT_bearing_femur": 0.002,
     "BOUGHT_bearing_knee": 0.002,
-    "BOUGHT_buck": 0.015,
     "BOUGHT_camera": 0.004,
+    "BOUGHT_fuse": 0.03,
     "BOUGHT_horn_coxa": 0.006,
     "BOUGHT_horn_femur": 0.006,
     "BOUGHT_horn_knee": 0.006,
+    "BOUGHT_ina219": 0.002,
     "BOUGHT_lipo": 0.098,
     "BOUGHT_pca9685": 0.009,
-    "BOUGHT_pi5": 0.046,
-    "BOUGHT_ubec": 0.025,
-    "BatteryTray": 0.0111,
-    "Carapace": 0.0307,
-    "ChassisBottom": 0.0406,
-    "ChassisTop": 0.0253,
+    "BOUGHT_pi5": 0.066,
+    "BOUGHT_port": 0.005,
+    "BOUGHT_respeaker": 0.015,
+    "BOUGHT_servo_board_1": 0.012,
+    "BOUGHT_servo_board_2": 0.012,
+    "BOUGHT_servo_board_3": 0.012,
+    "BOUGHT_servo_board_4": 0.012,
+    "BOUGHT_servo_board_5": 0.012,
+    "BOUGHT_speaker": 0.04,
+    "BOUGHT_switch": 0.03,
+    "BOUGHT_ubec_1": 0.012,
+    "BOUGHT_ubec_2": 0.012,
+    "BOUGHT_ubec_3": 0.012,
+    "BOUGHT_ubec_4": 0.012,
+    "BOUGHT_ubec_5": 0.012,
+    "BOUGHT_xl4005": 0.015,
+    "Belly": 0.026,
+    "BellyHatch": 0.0302,
+    "Carapace": 0.0509,
+    "ChassisBottom": 0.0429,
+    "ChassisTop": 0.0266,
     "Coxa": 0.0222,
-    "Deck": 0.029,
+    "Deck": 0.0386,
     "Femur": 0.0246,
-    "Tibia": 0.0242
+    "FootCap": 0.0017,
+    "SidePanel_1": 0.0048,
+    "SidePanel_2": 0.0048,
+    "SidePanel_3": 0.0048,
+    "SidePanel_4": 0.0048,
+    "SidePanel_5": 0.0048,
+    "Tibia": 0.0238
   },
   "segments": {
     "coxa": {
@@ -108,13 +130,13 @@
     },
     "tibia": {
       "com_mm": [
-        29.65,
-        2.5,
-        -0.0
+        32.02,
+        2.4,
+        0.0
       ],
-      "kg": 0.0322
+      "kg": 0.0335
     }
   },
-  "torso_kg": 0.6687,
-  "total_kg": 1.6937
+  "torso_kg": 1.008,
+  "total_kg": 2.0395
 }

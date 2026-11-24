@@ -248,9 +248,25 @@ def run(_context: str):
     t_horn, t_idl = driven_arms(knee_x, 38.0, 10.0)
     t_bridge = box(knee_x + 30, knee_x + 42, idl_y0, arm_y1, -10, 10)
     tip_r = 6.0
-    spine = cone((knee_x + 36, 0, 0), 10.0, (knee_x + LT - tip_r, 0, 0), tip_r)
-    foot = sphere((knee_x + LT - tip_r, 0, 0), tip_r)
+    CAP_T, CAP_FIT, CAP_LEN = 2.5, 0.15, 14.0  # TPU foot cap: wall, fit gap, sleeve length
+    tip_x = knee_x + LT - tip_r - CAP_T  # printed tip sits CAP_T short; the cap restores LT
+    spine = cone((knee_x + 36, 0, 0), 10.0, (tip_x, 0, 0), tip_r)
+    foot = sphere((tip_x, 0, 0), tip_r)
     tibia = uni(t_horn, t_idl, t_bridge, spine, foot)
+
+    def spine_r(x):  # radius of the tibia cone at x
+        return 10.0 + (tip_r - 10.0) * (x - (knee_x + 36)) / (tip_x - (knee_x + 36))
+
+    cap_x0 = tip_x - CAP_LEN
+    cap = uni(sphere((tip_x, 0, 0), tip_r + CAP_T),
+              cone((cap_x0, 0, 0), spine_r(cap_x0) + CAP_T, (tip_x, 0, 0), tip_r + CAP_T))
+    cut(cap, sphere((tip_x, 0, 0), tip_r + CAP_FIT),
+        cone((cap_x0 - 1, 0, 0), spine_r(cap_x0 - 1) + CAP_FIT, (tip_x, 0, 0), tip_r + CAP_FIT))
+    for k in range(4):  # grip ribs on the sleeve
+        x = tip_x - 3 - 3 * k
+        groove = cyl((x - 0.4, 0, 0), (x + 0.4, 0, 0), spine_r(x) + CAP_T + 1)
+        cut(groove, cyl((x - 0.5, 0, 0), (x + 0.5, 0, 0), spine_r(x) + CAP_T - 0.6))
+        cut(cap, groove)
 
     # ---------- fit coupon (separate printable part, placed beside the leg) ----------
     coupon = cradle((0, -120, 0), (0, 0, 1), (1, 0, 0))
@@ -340,6 +356,7 @@ def run(_context: str):
         "Tibia",
         [
             ("Tibia", tibia, "blue"),
+            ("FootCap", cap, "black"),
             ("BOUGHT_horn_knee", horn(*knee_servo_frame), "silver"),
             ("BOUGHT_bearing_knee", bearing((knee_x, idl_y1 - BW, 0), (knee_x, idl_y1, 0)), "silver"),
         ],

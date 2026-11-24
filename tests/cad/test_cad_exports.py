@@ -43,11 +43,12 @@ def test_manifest_meshes():
 
 def test_tibia_tip_at_segment_length():
     manifest = json.loads((CAD / "meshes" / "manifest.json").read_text())
-    tibia = next(
-        p for p in manifest["parts"] if p["segment"] == "tibia" and p["file"].startswith("Tibia")
-    )
-    v = read_stl(CAD / "meshes" / tibia["file"]).reshape(-1, 3) - np.array(tibia["origin_mm"])
-    assert v[:, 0].max() == pytest.approx(CFG.leg.tibia * 1000, abs=0.5)
+    # the foot tip is the contact point: printed tibia + TPU cap together reach the full length
+    tips = []
+    for part in (p for p in manifest["parts"] if p["segment"] == "tibia"):
+        v = read_stl(CAD / "meshes" / part["file"]).reshape(-1, 3) - np.array(part["origin_mm"])
+        tips.append(v[:, 0].max())
+    assert max(tips) == pytest.approx(CFG.leg.tibia * 1000, abs=0.5)
 
 
 def test_source_and_step_exist():

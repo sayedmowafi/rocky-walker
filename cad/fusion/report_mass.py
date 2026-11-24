@@ -11,10 +11,13 @@ import adsk.fusion
 PLA_G_CM3 = 1.24
 INFILL_FACTOR = 0.6
 MISC_KG = 0.060  # screws, nuts, wires, straps (not modelled)
-BOUGHT_KG = {
+BOUGHT_KG = {  # datasheet / listing masses (kg); prefixes match numbered parts
     "BOUGHT_MG996R": 0.055, "BOUGHT_horn": 0.006, "BOUGHT_bearing": 0.002,
-    "BOUGHT_pi5": 0.046, "BOUGHT_pca9685": 0.009, "BOUGHT_ubec": 0.025,
-    "BOUGHT_buck": 0.015, "BOUGHT_lipo": 0.098, "BOUGHT_camera": 0.004,
+    "BOUGHT_pi5": 0.066,  # incl. Active Cooler
+    "BOUGHT_pca9685": 0.009, "BOUGHT_ubec": 0.012, "BOUGHT_xl4005": 0.015,
+    "BOUGHT_ina219": 0.002, "BOUGHT_lipo": 0.098, "BOUGHT_camera": 0.004,
+    "BOUGHT_respeaker": 0.015, "BOUGHT_speaker": 0.040, "BOUGHT_fuse": 0.030,
+    "BOUGHT_switch": 0.030, "BOUGHT_port": 0.005, "BOUGHT_servo_board": 0.012,
 }
 STANCE_MM = {{gait.stance_radius_mm}}
 MOUNT_MM = {{body.mount_radius_mm}}
