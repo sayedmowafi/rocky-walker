@@ -29,6 +29,10 @@ def run(_context: str):
     stl_dir, mesh_dir = os.path.join(cad, "stl"), os.path.join(cad, "meshes")
     os.makedirs(stl_dir, exist_ok=True)
     os.makedirs(mesh_dir, exist_ok=True)
+    for d in (stl_dir, mesh_dir):  # drop meshes of parts that no longer exist
+        for name in os.listdir(d):
+            if name.endswith(".stl"):
+                os.remove(os.path.join(d, name))
 
     legs = [o for o in root.occurrences if o.component.name == "Leg"]
     leg = legs[0].component

@@ -132,6 +132,56 @@
       "color": "silver"
     },
     {
+      "file": "Chassis__ChassisTub_1.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "black"
+    },
+    {
+      "file": "Chassis__ChassisTub_2.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "black"
+    },
+    {
+      "file": "Chassis__ChassisTub_3.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "black"
+    },
+    {
+      "file": "Chassis__ChassisTub_4.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "black"
+    },
+    {
+      "file": "Chassis__ChassisTub_5.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "black"
+    },
+    {
       "file": "Chassis__ChassisTop.stl",
       "segment": "torso",
       "origin_mm": [
@@ -142,7 +192,7 @@
       "color": "black"
     },
     {
-      "file": "Chassis__ChassisBottom.stl",
+      "file": "Chassis__BatteryHatch.stl",
       "segment": "torso",
       "origin_mm": [
         0,
@@ -152,7 +202,57 @@
       "color": "black"
     },
     {
-      "file": "Deck__Deck.stl",
+      "file": "Carapace__Carapace_1.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "white"
+    },
+    {
+      "file": "Carapace__Carapace_2.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "white"
+    },
+    {
+      "file": "Carapace__Carapace_3.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "white"
+    },
+    {
+      "file": "Carapace__Carapace_4.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "white"
+    },
+    {
+      "file": "Carapace__Carapace_5.stl",
+      "segment": "torso",
+      "origin_mm": [
+        0,
+        0,
+        0
+      ],
+      "color": "white"
+    },
+    {
+      "file": "Carapace__CarapaceRing.stl",
       "segment": "torso",
       "origin_mm": [
         0,
@@ -162,7 +262,7 @@
       "color": "black"
     },
     {
-      "file": "Carapace__Carapace.stl",
+      "file": "Carapace__CarapaceCap.stl",
       "segment": "torso",
       "origin_mm": [
         0,
@@ -172,7 +272,7 @@
       "color": "white"
     },
     {
-      "file": "SidePanels__SidePanel_1.stl",
+      "file": "Carapace__RockFace_1.stl",
       "segment": "torso",
       "origin_mm": [
         0,
@@ -182,7 +282,7 @@
       "color": "white"
     },
     {
-      "file": "SidePanels__SidePanel_2.stl",
+      "file": "Carapace__RockFace_2.stl",
       "segment": "torso",
       "origin_mm": [
         0,
@@ -192,7 +292,7 @@
       "color": "white"
     },
     {
-      "file": "SidePanels__SidePanel_3.stl",
+      "file": "Carapace__RockFace_3.stl",
       "segment": "torso",
       "origin_mm": [
         0,
@@ -202,7 +302,7 @@
       "color": "white"
     },
     {
-      "file": "SidePanels__SidePanel_4.stl",
+      "file": "Carapace__RockFace_4.stl",
       "segment": "torso",
       "origin_mm": [
         0,
@@ -212,7 +312,7 @@
       "color": "white"
     },
     {
-      "file": "SidePanels__SidePanel_5.stl",
+      "file": "Carapace__RockFace_5.stl",
       "segment": "torso",
       "origin_mm": [
         0,
@@ -220,26 +320,6 @@
         0
       ],
       "color": "white"
-    },
-    {
-      "file": "Belly__Belly.stl",
-      "segment": "torso",
-      "origin_mm": [
-        0,
-        0,
-        0
-      ],
-      "color": "white"
-    },
-    {
-      "file": "Belly__BellyHatch.stl",
-      "segment": "torso",
-      "origin_mm": [
-        0,
-        0,
-        0
-      ],
-      "color": "black"
     },
     {
       "file": "Electronics__BOUGHT_pi5.stl",

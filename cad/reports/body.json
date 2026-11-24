@@ -1,5 +1,14 @@
 {
-  "chassis_height_mm": 32.3,
+  "body_size_mm": [
+    229.6,
+    238.9,
+    76.8
+  ],
+  "body_z_mm": [
+    -30.2,
+    46.6
+  ],
+  "chassis_height_mm": 60.3,
   "components": [
     "camera",
     "fuse",
@@ -23,97 +32,161 @@
     "ubec_5",
     "xl4005"
   ],
-  "coxa_axis_radius_mm": 70.0,
+  "coxa_axis_radius_mm": 100.0,
   "coxa_sweep": {},
   "interference_neutral": [],
   "printed": {
-    "Belly": {
+    "BatteryHatch": {
       "bbox_mm": [
-        140.0,
-        140.0,
-        31.8
-      ],
-      "volume_mm3": 34970.9
-    },
-    "BellyHatch": {
-      "bbox_mm": [
-        134.6,
-        134.6,
+        94.16,
+        85.75,
         3.0
       ],
-      "volume_mm3": 40539.6
+      "volume_mm3": 10013.1
     },
-    "Carapace": {
+    "CarapaceCap": {
       "bbox_mm": [
-        131.0,
-        131.0,
-        60.0
+        58.36,
+        61.35,
+        6.6
       ],
-      "volume_mm3": 68413.5
+      "volume_mm3": 11452.3
     },
-    "ChassisBottom": {
+    "CarapaceRing": {
       "bbox_mm": [
-        170.63,
-        177.15,
-        29.3
+        68.74,
+        72.28,
+        3.5
       ],
-      "volume_mm3": 57630.6
+      "volume_mm3": 8825.6
+    },
+    "Carapace_1": {
+      "bbox_mm": [
+        106.18,
+        118.49,
+        25.0
+      ],
+      "volume_mm3": 26957.2
+    },
+    "Carapace_2": {
+      "bbox_mm": [
+        112.69,
+        104.99,
+        25.0
+      ],
+      "volume_mm3": 26713.0
+    },
+    "Carapace_3": {
+      "bbox_mm": [
+        95.61,
+        95.86,
+        25.0
+      ],
+      "volume_mm3": 26796.9
+    },
+    "Carapace_4": {
+      "bbox_mm": [
+        95.61,
+        95.86,
+        25.0
+      ],
+      "volume_mm3": 26303.5
+    },
+    "Carapace_5": {
+      "bbox_mm": [
+        112.69,
+        105.19,
+        25.0
+      ],
+      "volume_mm3": 26704.7
     },
     "ChassisTop": {
       "bbox_mm": [
-        170.63,
-        177.15,
-        3.0
+        173.41,
+        174.0,
+        31.0
       ],
-      "volume_mm3": 35746.1
+      "volume_mm3": 69092.7
     },
-    "Deck": {
+    "ChassisTub_1": {
       "bbox_mm": [
-        131.0,
-        131.0,
-        56.9
+        104.95,
+        123.08,
+        56.2
       ],
-      "volume_mm3": 51838.6
+      "volume_mm3": 43702.4
     },
-    "SidePanel_1": {
+    "ChassisTub_2": {
       "bbox_mm": [
-        30.37,
-        40.62,
-        59.2
+        137.04,
+        105.18,
+        56.2
       ],
-      "volume_mm3": 6413.7
+      "volume_mm3": 45551.6
     },
-    "SidePanel_2": {
+    "ChassisTub_3": {
       "bbox_mm": [
-        47.07,
-        17.82,
-        59.2
+        90.62,
+        137.58,
+        56.2
       ],
-      "volume_mm3": 6413.7
+      "volume_mm3": 44604.5
     },
-    "SidePanel_3": {
+    "ChassisTub_4": {
       "bbox_mm": [
-        10.57,
-        49.49,
-        59.2
+        124.93,
+        98.3,
+        56.2
       ],
-      "volume_mm3": 6413.7
+      "volume_mm3": 43763.1
     },
-    "SidePanel_4": {
+    "ChassisTub_5": {
       "bbox_mm": [
-        47.07,
-        17.82,
-        59.2
+        113.21,
+        115.17,
+        56.2
       ],
-      "volume_mm3": 6413.7
+      "volume_mm3": 45935.5
     },
-    "SidePanel_5": {
+    "RockFace_1": {
       "bbox_mm": [
-        30.37,
-        40.62,
-        59.2
+        50.13,
+        68.19,
+        26.86
       ],
-      "volume_mm3": 6413.7
+      "volume_mm3": 4185.2
+    },
+    "RockFace_2": {
+      "bbox_mm": [
+        78.21,
+        27.37,
+        25.26
+      ],
+      "volume_mm3": 4051.5
+    },
+    "RockFace_3": {
+      "bbox_mm": [
+        5.32,
+        81.99,
+        24.1
+      ],
+      "volume_mm3": 4058.2
+    },
+    "RockFace_4": {
+      "bbox_mm": [
+        80.44,
+        28.41,
+        24.8
+      ],
+      "volume_mm3": 4414.7
+    },
+    "RockFace_5": {
+      "bbox_mm": [
+        48.99,
+        66.78,
+        26.09
+      ],
+      "volume_mm3": 4399.1
     }
   }
 }

@@ -82,6 +82,15 @@ def run(_context: str):
             printed[b.name] = {"bbox_mm": [round(d, 2) for d in dims],
                                "volume_mm3": round(b.volume * 1000, 1)}
     report["printed"] = printed
+    lo, hi = [1e9] * 3, [-1e9] * 3
+    for occ in body_occ.childOccurrences:
+        for b in occ.bRepBodies:
+            bb = b.boundingBox
+            for k, (a, c) in enumerate(((bb.minPoint.x, bb.maxPoint.x), (bb.minPoint.y, bb.maxPoint.y),
+                                        (bb.minPoint.z, bb.maxPoint.z))):
+                lo[k], hi[k] = min(lo[k], a * 10), max(hi[k], c * 10)
+    report["body_size_mm"] = [round(hi[k] - lo[k], 1) for k in range(3)]
+    report["body_z_mm"] = [round(lo[2], 1), round(hi[2], 1)]
     report["components"] = sorted(
         b.name[len("BOUGHT_"):] for occ in body_occ.childOccurrences for b in occ.bRepBodies
         if b.name.startswith("BOUGHT_")

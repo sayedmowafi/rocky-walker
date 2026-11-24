@@ -46,6 +46,10 @@ def parse_args():
     p.add_argument("--frames", type=int, default=None)
     p.add_argument("--engine", choices=["eevee", "workbench"], default="eevee")
     p.add_argument("--save", type=Path, default=None)
+    p.add_argument("--cam", default="0.5,-0.5,0.3", help="camera offset from the torso, metres")
+    p.add_argument("--aim-z", type=float, default=0.0, help="aim this far above the hip plane")
+    p.add_argument("--lens", type=float, default=40.0)
+    p.add_argument("--hide", default="", help="comma-separated mesh-name prefixes to leave out")
     return p.parse_args(argv)
 
 
@@ -108,7 +112,10 @@ def build(args):
     LC, LF = cfg["leg"]["coxa_mm"] / 1000, cfg["leg"]["femur_mm"] / 1000
     manifest = json.loads((args.meshes / "manifest.json").read_text())
     meshes = {}
+    hidden = tuple(h for h in args.hide.split(",") if h)
     for part in manifest["parts"]:
+        if hidden and part["file"].startswith(hidden):
+            continue
         meshes.setdefault(part["segment"], []).append(
             import_mesh(args.meshes / part["file"], part["origin_mm"], part["color"])
         )
@@ -171,8 +178,9 @@ def _fcurves(action):
     return out
 
 
-def stage(torso, engine):
+def stage(torso, args):
     scene = bpy.context.scene
+    engine = args.engine
     # floor
     bpy.ops.mesh.primitive_plane_add(size=20, location=(0, 0, 0))
     floor = bpy.context.active_object
@@ -215,13 +223,17 @@ def stage(torso, engine):
     c = rig.constraints.new("COPY_LOCATION")
     c.target = torso
     cam_data = bpy.data.cameras.new("camera")
-    cam_data.lens = 40
+    cam_data.lens = args.lens
     cam = bpy.data.objects.new("camera", cam_data)
     scene.collection.objects.link(cam)
     cam.parent = rig
-    cam.location = (0.5, -0.5, 0.3)
+    cam.location = tuple(float(v) for v in args.cam.split(","))
+    aim = bpy.data.objects.new("camera_aim", None)
+    scene.collection.objects.link(aim)
+    aim.parent = rig
+    aim.location = (0, 0, args.aim_z)
     track = cam.constraints.new("TRACK_TO")
-    track.target = rig
+    track.target = aim
     track.track_axis = "TRACK_NEGATIVE_Z"
     track.up_axis = "UP_Y"
     scene.camera = cam
@@ -281,7 +293,7 @@ def main():
     frames = anim["frames"]
     n = args.frames or len(frames)
     animate(torso, joints, frames, n)
-    stage(torso, args.engine)
+    stage(torso, args)
     if args.save:
         args.save.parent.mkdir(parents=True, exist_ok=True)
         bpy.ops.wm.save_as_mainfile(filepath=str(args.save.resolve()))

@@ -12,7 +12,7 @@ def test_five_mounts_at_72_degrees():
     assert [m.index for m in mounts] == [0, 1, 2, 3, 4]
     assert np.degrees([m.yaw for m in mounts]) == pytest.approx([0, 72, 144, 216, 288])
     for m in mounts:
-        assert np.linalg.norm(m.position) == pytest.approx(0.07)
+        assert np.linalg.norm(m.position) == pytest.approx(0.10)
         assert m.position[2] == 0.0
 
 
