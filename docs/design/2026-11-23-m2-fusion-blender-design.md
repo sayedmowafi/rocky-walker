@@ -1,6 +1,6 @@
 # M2: Fusion 360 Design + Blender Showcase
 
-- **Status:** reviewed, awaiting owner approval
+- **Status:** approved by the owner (2026-11-24)
 - **Date:** 2026-11-23
 - **Parent spec:** `docs/design/2026-11-23-rocky-walker-design.md` (§5.2 was revised to Fusion 360 on this date)
 - **Scope:** the complete robot designed in Fusion 360, then shown assembled, walking and dancing in Blender, animated by the real motion code. There's no physical hardware in this milestone. The bench leg (servo driver, calibration, real servos) becomes the next milestone.

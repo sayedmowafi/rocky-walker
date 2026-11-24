@@ -1,6 +1,6 @@
 # Rocky Walker: Design
 
-- **Status:** reviewed, awaiting owner approval
+- **Status:** approved by the owner (2026-11-24)
 - **Date:** 2026-11-23
 - **Scope:** the whole robot (mechanics, electronics, software, milestones). Later features (follow mode, voice) are designed only as far as needed so the core doesn't block them.
 
