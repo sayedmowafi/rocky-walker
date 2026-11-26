@@ -19,7 +19,7 @@ Label every servo with a number on masking tape before testing.
 | 12 | Beffkkip (2-pack) | ✅ | ❌ jams | silent | — | FAULTY: drives to 1000 us end then sticks, gears click; by hand it stops dead at one point (internal jam / damaged gear) | RETURN, do not use |
 | 13 | Beffkkip (2-pack) | — | — | — | — | FAULTY out of the box: jams by hand at the same position as #11/#12 | RETURN, do not use |
 | 14 | Beffkkip (2-pack) | — | — | — | — | FAULTY out of the box: jams by hand at the same position as #11/#12 | RETURN, do not use |
-| 15 | (local shop) | | | | | | |
+| 15 | Besomi (local shop, single) | ✅ | ✅ | silent | not tested | slow sweep + 6 full-range jumps clean | knee |
 
 Best ten (smoothest, quietest) go to the hips (coxa, femur). The rest go to the knees.
 
@@ -27,5 +27,6 @@ Best ten (smoothest, quietest) go to the hips (coxa, femur). The rest go to the 
 
 - **Reland Sun (#1–#10): 10/10 good.** All smooth and silent at rest. These are the hip servos.
 - **Beffkkip (#11–#14): 4/4 faulty.** Every one jams at the same position (#11 and #12 under power, #13 and #14 by hand, out of the box): a defective batch or design. All four returned.
-- **Still needed:** 4 replacement knee servos + 2 spares (Reland Sun, since all 10 were perfect). The 15th servo (local shop) is still on its way and gets the same test.
+- **Besomi #15: good** (slow sweep + full-range jumps clean). **11 good servos in total.**
+- **Still needed:** 4 knee servos + 2 spares (Reland Sun, since all 10 were perfect).
 - **Lesson for rebuilders:** before testing a new servo under power, turn the output shaft gently by hand through its range. A dead spot means a damaged gear, and powering it only makes it worse.
