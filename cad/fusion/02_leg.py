@@ -171,7 +171,7 @@ def run(_context: str):
             p1 = tuple(p0[i] + ax[i] * length for i in range(3))
             holes.append(cyl(p0, p1, M3 / 2))
         p1 = tuple(center_axis_p0[i] + ax[i] * length for i in range(3))
-        holes.append(cyl(center_axis_p0, p1, 4.0))
+        holes.append(cyl(center_axis_p0, p1, 3.0))  # centre-screw head clearance; must not merge with the bolt holes
         return holes
 
     # ---------- servo placements ----------

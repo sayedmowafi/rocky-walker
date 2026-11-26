@@ -51,7 +51,7 @@ PARAMS = [
     ("bearing_w", "4 mm", "mm", "623ZZ width"),
     ("horn_d", "20 mm", "mm", "round aluminium 25T horn diameter"),
     ("horn_t", "2.5 mm", "mm", "horn plate thickness"),
-    ("horn_bolt_circle", "14 mm", "mm", "horn M3 bolt-circle diameter"),
+    ("horn_bolt_circle", "11.3 mm", "mm", "horn M3 bolt-circle diameter (calipers, opposite holes centre to centre)"),
 ]
 
 

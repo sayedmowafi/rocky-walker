@@ -33,3 +33,11 @@ Real measurements replace listing/datasheet sizes in the Fusion parameters.
 
 Decision (owner, 2026-11-26): use the STEP model's values where they disagreed with rough caliper readings; keep the caliper body L × W.
 Servo ear screws change from M3 to **M4** (holes are Ø 4.4), with M4 captive-nut pockets or M4 self-tapping pilots.
+
+## Aluminium 25T disc horn
+
+| Dimension | Measured | Was in CAD |
+|---|---|---|
+| Bolt circle (opposite holes, centre to centre) | **11.3 mm** | 14 mm |
+
+The printed parts' centre clearance hole shrank from 8 mm to 6 mm so it stays separate from the bolt holes.
