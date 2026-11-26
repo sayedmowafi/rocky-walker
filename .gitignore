@@ -21,3 +21,5 @@ out/
 !cad/stl/*.stl
 !cad/meshes/*.stl
 !cad/rocky.step
+
+!cad/stl/plates/**/*.stl
