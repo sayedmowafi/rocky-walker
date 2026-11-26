@@ -69,17 +69,21 @@
     "m3_clear": 3.4,
     "m3_nut_af": 5.6,
     "m3_nut_t": 2.6,
-    "mount_radius_mm": 70.0,
-    "servo_ear_hole_gap": 10.0,
-    "servo_ear_hole_pitch": 49.5,
-    "servo_ear_l": 54.6,
-    "servo_ear_t": 2.5,
-    "servo_ear_z": 29.0,
-    "servo_h": 42.9,
-    "servo_l": 40.7,
-    "servo_shaft_h": 5.0,
-    "servo_shaft_offset": 10.2,
-    "servo_w": 19.7,
+    "m4_clear": 4.4,
+    "m4_nut_af": 7.2,
+    "m4_nut_t": 3.4,
+    "m4_pilot": 3.4,
+    "mount_radius_mm": 100.0,
+    "servo_ear_hole_gap": 10.5,
+    "servo_ear_hole_pitch": 49.4,
+    "servo_ear_l": 54.0,
+    "servo_ear_t": 2.4,
+    "servo_ear_z": 30.0,
+    "servo_h": 38.55,
+    "servo_l": 40.3,
+    "servo_shaft_h": 5.65,
+    "servo_shaft_offset": 9.75,
+    "servo_w": 19.9,
     "tibia_max_deg": -20.0,
     "tibia_min_deg": -135.0,
     "tibia_mm": 100.0,
@@ -88,19 +92,19 @@
   "printed": {
     "Coxa": {
       "bbox_mm": [
-        66.15,
-        37.75,
-        64.45
+        66.25,
+        35.57,
+        64.4
       ],
-      "volume_mm3": 29862.4
+      "volume_mm3": 28543.7
     },
     "Femur": {
       "bbox_mm": [
-        102.15,
-        60.7,
-        26.3
+        101.6,
+        57.0,
+        26.5
       ],
-      "volume_mm3": 33064.6
+      "volume_mm3": 32953.9
     },
     "FootCap": {
       "bbox_mm": [
@@ -113,10 +117,10 @@
     "Tibia": {
       "bbox_mm": [
         112.73,
-        60.7,
+        57.0,
         62.23
       ],
-      "volume_mm3": 32028.7
+      "volume_mm3": 31140.7
     }
   },
   "stance_deg": {
