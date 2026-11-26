@@ -36,6 +36,7 @@ def run(_context: str):
     EZ, SO, SS = mm("servo_ear_z"), mm("servo_shaft_offset"), mm("servo_shaft_h")
     C, WALL = mm("fit_clearance"), mm("wall")
     M3, NAF, NT = mm("m3_clear"), mm("m3_nut_af"), mm("m3_nut_t")
+    M4, NAF4, NT4, M4P = mm("m4_clear"), mm("m4_nut_af"), mm("m4_nut_t"), mm("m4_pilot")
     N = 5
     PSI = [2 * math.pi * i / N for i in range(N)]
 
@@ -93,12 +94,13 @@ def run(_context: str):
         tbm.transform(body, m)
         return body
 
-    def hexnut(cx, cy, z0, depth):
+    def hexnut(cx, cy, z0, depth, af=None):
+        af = af or NAF
         out = None
         for k in range(3):
             a = math.radians(60 * k)
             s = obox((cx, cy, z0 + depth / 2), (math.cos(a), math.sin(a), 0),
-                     (-math.sin(a), math.cos(a), 0), NAF, NAF * 3, depth)
+                     (-math.sin(a), math.cos(a), 0), af, af * 3, depth)
             if out is None:
                 out = s
             else:
@@ -224,7 +226,7 @@ def run(_context: str):
             tub, at_leg(box(SO + C + 0.2, CHEEK_R - TW + 0.5, -8.5, 8.5, Z_F1, Z_D1), i), UNION)
         for hx, hy in ear_holes:
             if hx > 0:
-                cut(tub, at_leg(cyl((hx, hy, Z_D1 - 14), (hx, hy, Z_D1 + 1), 1.25), i))
+                cut(tub, at_leg(cyl((hx, hy, Z_D1 - 14), (hx, hy, Z_D1 + 1), M4P / 2), i))
         for s_ in (-1, 1):  # posts the top plate screws onto, either side of the servo
             tbm.booleanOperation(tub, hcyl(i, -20, s_ * 17, Z_F1, Z_D0, 4.0), UNION)
             cut(tub, hcyl(i, -20, s_ * 17, Z_D0 - 12, Z_D0 + 1, 1.3))
@@ -295,8 +297,8 @@ def run(_context: str):
         cut(disc, at_leg(box(-(SL - SO) - C, 60, -SW / 2 - C, SW / 2 + C, Z_D0 - 1, Z_D1 + 1), i))
         for hx, hy in ear_holes:
             if hx < 0:
-                cut(disc, at_leg(cyl((hx, hy, Z_D0 - 1), (hx, hy, Z_D1 + 1), M3 / 2), i))
-                cut(disc, at_leg(hexnut(hx, hy, Z_D0 - 0.01, NT), i))
+                cut(disc, at_leg(cyl((hx, hy, Z_D0 - 1), (hx, hy, Z_D1 + 1), M4 / 2), i))
+                cut(disc, at_leg(hexnut(hx, hy, Z_D0 - 0.01, NT4, NAF4), i))
         for s_ in (-1, 1):
             cut(disc, hcyl(i, -20, s_ * 17, Z_D0 - 1, Z_D1 + 1, M3 / 2))
         cut(disc, pbox(SEC[i], 30, 42, -6, 6, Z_D0 - 1, Z_D1 + 1))  # wires between the levels
