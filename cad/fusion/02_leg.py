@@ -278,43 +278,63 @@ def run(_context: str):
         )
         cut(idl_arm, cyl((axis_x, idl_y1 - BW, 0), (axis_x, idl_y1 + 1, 0), BOD / 2))
         cut(idl_arm, cyl((axis_x, idl_y0 - 1, 0), (axis_x, idl_y1, 0), HEAD_R))  # screw head recess
+        for arm in (horn_arm, idl_arm):  # trim the round hubs flush with the arm faces: the part
+            for zz in (half_w, -half_w - 30):  # then lies flat on the bed with nothing hanging
+                cut(arm, box(axis_x - 30, axis_x + 30, idl_y0 - 1, arm_y1 + 1, zz, zz + 30))
         return horn_arm, idl_arm
 
+    # Two printed parts so each prints flat with no supports: the FORK (both arms + a bridge,
+    # lying on its side) and the knee-servo CRADLE (floor down, like the coxa's). Three M3x12
+    # self-tap screws run from the bridge into the cradle's hip-end ear block.
     kc = cradle(*knee_servo_frame)
-    kc_x0 = knee_x - (SL - SO) - o  # knee cradle's hip-side edge (servo body points to the hip)
-    f_horn, f_idl = driven_arms(LC, kc_x0 - LC + 1, 10.0)
-    bridge = box(kc_x0 - 10, kc_x0 + 1, idl_y0, arm_y1, -10, 10)
-    femur = uni(f_horn, f_idl, bridge, kc)
-    # clearance above the knee servo's hip-side ears (and screw-head access)
-    ear_x0 = knee_x - (ear_cx + EL / 2)
-    cut(femur, box(ear_x0 - GAP, kc_x0 + 1.5, -SH / 2 + EZ, 60, -SW / 2 - C - 0.5, SW / 2 + C + 0.5))
-    # keep the knee servo pocket clear of the bridge
-    cut(femur, box(knee_x - SL + SO - C, knee_x + SO + C, -SH / 2 - C, 60, -SW / 2 - C, SW / 2 + C))
-    cut(femur, *ear_pilots(knee_servo_frame))  # the bridge overlaps the hip-side ear block
+    kc_x0 = knee_x - (SL - SO) - o  # knee cradle's hip-side wall (servo body points to the hip)
+    joint_x = knee_x - (ear_cx + EL / 2 + 2)  # the cradle's hip-end face (back of its ear block)
+    FW = 10.0  # fork half-width (z)
+    f_horn, f_idl = driven_arms(LC, joint_x - LC, FW)
+    bridge = box(kc_x0 - 10, joint_x, idl_y0, arm_y1, -FW, FW)
+    femur = uni(f_horn, f_idl, bridge)
+    FEMUR_SCREWS = ((-16.0, 6.0), (-16.0, -6.0), (0.0, 0.0))  # (y, z) on the joint face
+    for yy, zz in FEMUR_SCREWS:
+        cut(femur, cyl((kc_x0 - 11, yy, zz), (joint_x + 1, yy, zz), M3 / 2))
+        # M3x12 from the bridge's hip-side face: the tip ends 1 mm short of the servo pocket
+        cut(kc, cyl((joint_x - 1, yy, zz), (kc_x0 - 10 + 12.5, yy, zz), M3P / 2))
+    femur_cradle = kc
 
     # ---------- tibia ----------
-    t_horn, t_idl = driven_arms(knee_x, 38.0, 10.0)
-    t_bridge = box(knee_x + 30, knee_x + 42, idl_y0, arm_y1, -10, 10)
+    # A flat-sided blade (z +-10, like the arms) that tapers in y to a rounded foot: the whole
+    # tibia lies flat on its side to print, with nothing hanging.
+    TW_ = 10.0
+    t_horn, t_idl = driven_arms(knee_x, 38.0, TW_)
+    t_bridge = box(knee_x + 30, knee_x + 42, idl_y0, arm_y1, -TW_, TW_)
     tip_r = 6.0
-    CAP_T, CAP_FIT, CAP_LEN = 2.5, 0.15, 14.0  # TPU foot cap: wall, fit gap, sleeve length
-    tip_x = knee_x + LT - tip_r - CAP_T  # printed tip sits CAP_T short; the cap restores LT
-    spine = cone((knee_x + 36, 0, 0), 10.0, (tip_x, 0, 0), tip_r)
-    foot = sphere((tip_x, 0, 0), tip_r)
-    tibia = uni(t_horn, t_idl, t_bridge, spine, foot)
+    CAP_T, CAP_FIT, CAP_LEN = 2.5, 0.15, 14.0  # TPU foot boot: wall, fit gap, sleeve length
+    tip_x = knee_x + LT - tip_r - CAP_T  # printed tip sits CAP_T short; the boot restores LT
+    x0, w0 = knee_x + 36, 10.0  # blade root (inside the bridge) and its half-width
 
-    def spine_r(x):  # radius of the tibia cone at x
-        return 10.0 + (tip_r - 10.0) * (x - (knee_x + 36)) / (tip_x - (knee_x + 36))
+    def blade(grow, z_half, x_start):
+        """The tapered blade + rounded foot, grown by `grow` in x/y (for the boot)."""
+        import math
 
+        ang = math.atan2(tip_r - w0, tip_x - x0)
+        b = box(x_start, tip_x, -w0 - grow - 5, w0 + grow + 5, -z_half, z_half)
+        for side in (1, -1):  # cut the two tapered faces
+            org = (x0, side * (w0 + grow), 0)
+            xd = (math.cos(ang), side * math.sin(ang), 0)
+            slab = box(-60, 200, 0, 60, -40, 40) if side == 1 else box(-60, 200, -60, 0, -40, 40)
+            cut(b, place(slab, org, (0, 0, 1), xd))
+        return uni(b, cyl((tip_x, 0, -z_half), (tip_x, 0, z_half), tip_r + grow))
+
+    def blade_w(x):  # blade half-width at x
+        return w0 + (tip_r - w0) * (x - x0) / (tip_x - x0)
+
+    tibia = uni(t_horn, t_idl, t_bridge, blade(0.0, TW_, x0))
     cap_x0 = tip_x - CAP_LEN
-    cap = uni(sphere((tip_x, 0, 0), tip_r + CAP_T),
-              cone((cap_x0, 0, 0), spine_r(cap_x0) + CAP_T, (tip_x, 0, 0), tip_r + CAP_T))
-    cut(cap, sphere((tip_x, 0, 0), tip_r + CAP_FIT),
-        cone((cap_x0 - 1, 0, 0), spine_r(cap_x0 - 1) + CAP_FIT, (tip_x, 0, 0), tip_r + CAP_FIT))
-    for k in range(4):  # grip ribs on the sleeve
-        x = tip_x - 3 - 3 * k
-        groove = cyl((x - 0.4, 0, 0), (x + 0.4, 0, 0), spine_r(x) + CAP_T + 1)
-        cut(groove, cyl((x - 0.5, 0, 0), (x + 0.5, 0, 0), spine_r(x) + CAP_T - 0.6))
-        cut(cap, groove)
+    cap = blade(CAP_T, TW_ + CAP_T, cap_x0)
+    cut(cap, blade(CAP_FIT, TW_ + CAP_FIT, cap_x0 - 5))
+    for k in range(3):  # grip ribs across the sole
+        gx = tip_x - 2.0 - 3.0 * k
+        cut(cap, box(gx - 0.5, gx + 0.5, -40, 40, TW_ + CAP_T - 0.6, TW_ + CAP_T + 1))
+        cut(cap, box(gx - 0.5, gx + 0.5, -40, 40, -TW_ - CAP_T - 1, -TW_ - CAP_T + 0.6))
 
     # ---------- bench mount (stands in for the body on the bench) ----------
     # The hip-yaw servo's pocket exactly as the body will hold it, plus a tail that clamps to a
@@ -413,6 +433,7 @@ def run(_context: str):
         "Femur",
         [
             ("Femur", femur, "black"),
+            ("FemurCradle", femur_cradle, "black"),
             ("BOUGHT_MG996R_knee", servo(*knee_servo_frame), "grey"),
             ("BOUGHT_horn_femur", horn(*femur_servo_frame), "silver"),
             ("BOUGHT_bearing_femur", bearing((LC, idl_y1 - BW, 0), (LC, idl_y1, 0)), "silver"),

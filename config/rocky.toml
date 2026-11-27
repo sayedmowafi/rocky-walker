@@ -8,13 +8,13 @@ mount_radius_mm = 100   # wide body: body centre -> coxa axis (was 70 in the sta
 thickness_mm = 59.7    # wide body: chassis tub floor-to-eave height from the Fusion body (was 32 stacked)
 
 [mass]                  # M2: measured from the Fusion design (cad/reports/mass.json)
-total_kg = 2.175        # wide body + measured servo/horn sizes (cad/reports/mass.json)
-coxa_link_kg = 0.0889   # coxa bracket + femur servo + horn + bearing
-femur_link_kg = 0.0900  # femur + knee servo + horn + bearing
-tibia_link_kg = 0.0335  # tibia + TPU foot cap + horn + bearing
+total_kg = 2.193        # wide body + measured servo/horn sizes (cad/reports/mass.json)
+coxa_link_kg = 0.0888   # coxa bracket + femur servo + horn + bearing
+femur_link_kg = 0.0880  # femur + knee servo + horn + bearing
+tibia_link_kg = 0.0392  # tibia + TPU foot cap + horn + bearing
 coxa_link_com_mm = 34.1   # along the segment from its proximal joint axis
-femur_link_com_mm = 49.5
-tibia_link_com_mm = 32.0
+femur_link_com_mm = 50.0
+tibia_link_com_mm = 39.1
 
 [leg]                   # frozen at M1 (sim torque log, build log 01)
 coxa_mm = 40

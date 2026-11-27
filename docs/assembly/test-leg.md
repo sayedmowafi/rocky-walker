@@ -9,8 +9,7 @@ Print top to bottom, one plate at a time, and test each stage before printing th
 | Print | File | Parts |
 |---|---|---|
 | 1 | `cad/stl/plates/print1-hip/plate.3mf` | Hip bracket (Coxa) + bench mount |
-| 2 | femur plate (next) | Femur |
-| 3 | tibia plate (next) | Tibia |
+| 2 | `cad/stl/plates/print2-femur-tibia/plate.3mf` | Femur fork + femur cradle + tibia |
 
 > Prints from before 2026-11-27 have the wrong horn hole spacing and need nuts. Don't mix them
 > with these parts.
@@ -22,6 +21,7 @@ Print top to bottom, one plate at a time, and test each stage before printing th
 | M4 × 12 screw | 12 | Servo ears, 4 per servo. Self-taps into the 3.4 mm pilots in the printed ear blocks. No nuts |
 | M3 × 6 screw (button or socket head) | 12 | Printed arm → aluminium horn, 4 per horn. The horn holes are threaded, so no nuts |
 | M3 × 8 screw (button or socket head) | 3 | Pivots: coxa lower arm, femur idler, tibia idler. Self-taps into the cradle floor |
+| M3 × 12 screw | 3 | Femur fork → femur cradle. Self-taps into the cradle's end block |
 | M3 washer (0.5 mm) | 6 | Two under each pivot, between the bearing and the cradle floor |
 | 623ZZ bearing | 3 | Coxa lower arm, femur idler arm, tibia idler arm |
 | 25T aluminium disc horn + its centre screw | 3 | One per servo |
@@ -79,18 +79,26 @@ Step-by-step with pictures: [print1-hip.md](print1-hip.md).
 
 ![Femur, exploded](media/02-femur.png)
 
-1. **Knee servo (2) into the femur's cradle,** cable out through the slot in the shaft-end wall.
-   4× M4 × 12.
-2. **623 bearing (4)** pressed into the idler arm (the arm without the four holes), from the inside
-   face.
-3. **Fit the femur's fork over the hip-lift servo** on the coxa. The horn arm (3) goes on the horn
-   side; on the other side, two M3 washers go between the bearing and the cradle floor.
-4. 4× M3 × 6 through the horn arm into the horn. The femur should sit level with the servo at
+The femur is two printed parts, so both print flat with no supports:
+- **Fork:** the two round-ended arms and the bridge between them.
+- **Cradle:** holds the knee servo.
+
+1. **Knee servo into the cradle,** spline facing out of the open side. The cable goes out through
+   the slot in the end wall. 4× M4 × 12.
+2. **Fork onto the cradle.** The bridge sits flat against the cradle's back face, the end away
+   from the knee spline. Fit 3× M3 × 12 through the bridge's three holes into the cradle. Drive
+   them slowly: they cut their own thread.
+3. **623 bearing** pressed into the fork's idler arm (the arm without the four holes), from the
+   inside face.
+4. **Fit the fork over the hip-lift servo** on the hip bracket:
+   - the horn arm goes on servo 2's horn (fit a horn to servo 2 first, centred with `c`);
+   - on the bearing side, two M3 washers go between the bearing and the bracket's cradle floor.
+5. 4× M3 × 6 through the horn arm into the horn. The femur should sit level with the servo at
    centre.
-5. **Idler screw:** M3 × 8 from the outside, through the bearing and the washers, into the cradle
+6. **Idler screw:** M3 × 8 from the outside, through the bearing and the washers, into the cradle
    floor. Stop as soon as it grips.
 
-## 3. Tibia (print 3)
+## 3. Tibia (print 2)
 
 ![Tibia, exploded](media/03-tibia.png)
 
@@ -99,8 +107,10 @@ Step-by-step with pictures: [print1-hip.md](print1-hip.md).
    the tibia should hang about 80° below the femur line: mid-travel of the knee's −135° to −20°
    range.
 3. **Idler screw:** M3 × 8 + 2 washers into the femur cradle's floor, same as above.
-4. **TPU foot cap (4)** pushes on once you've printed it in TPU. Until then, run the bare tibia
-   tip on the bench.
+4. **TPU foot boot (4)** pushes over the rounded foot once you've printed it in TPU. Until then,
+   run the bare foot on the bench.
+
+The tibia is a flat-sided blade so it prints lying flat; the rounded end is the foot.
 
 ## 4. Done
 

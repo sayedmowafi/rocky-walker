@@ -62,6 +62,16 @@
       "color": "black"
     },
     {
+      "file": "Femur__FemurCradle.stl",
+      "segment": "femur",
+      "origin_mm": [
+        40.0,
+        0,
+        0
+      ],
+      "color": "black"
+    },
+    {
       "file": "Femur__BOUGHT_MG996R_knee.stl",
       "segment": "femur",
       "origin_mm": [
