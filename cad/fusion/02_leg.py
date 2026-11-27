@@ -214,7 +214,9 @@ def run(_context: str):
     o = C + WALL
     cr_x0, cr_x1 = LC - SW / 2 - o, LC + SW / 2 + o
     top_z0, top_z1 = coxa_arm_z0, coxa_arm_z0 + ARM
-    bot_z1 = coxa_top - SH - C - WALL - IGAP  # under the hip-yaw pocket floor + 2 washers
+    # BENCH_DROP > 0 only for one-off brackets that must fit an older, taller bench mount
+    BENCH_DROP = 0.0
+    bot_z1 = coxa_top - SH - C - WALL - IGAP - BENCH_DROP  # under the hip-yaw pocket floor + 2 washers
     bot_z0 = bot_z1 - IDL
     cr_y0, cr_y1 = floor_y, -SH / 2 + EZ  # cradle y range (floor .. ear plate top)
     def hub_web(z0, z1):
