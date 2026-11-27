@@ -50,7 +50,7 @@ PARAMS = [
     ("m4_clear", "4.4 mm", "mm", "M4 clearance hole (servo ear screws)"),
     ("m4_nut_af", "7.2 mm", "mm", "M4 nut across flats (+clearance)"),
     ("m4_nut_t", "3.4 mm", "mm", "M4 nut thickness (+clearance)"),
-    ("m4_pilot", "3.4 mm", "mm", "M4 self-tapping pilot hole in printed plastic"),
+    ("m4_pilot", "3.7 mm", "mm", "M4 self-tapping pilot hole in printed plastic (3.4 printed too tight in PLA)"),
     ("m3_pilot", "2.5 mm", "mm", "M3 self-tapping pilot hole in printed plastic (idler screws)"),
     ("bearing_od", "10 mm", "mm", "623ZZ outer diameter"),
     ("bearing_id", "3 mm", "mm", "623ZZ bore"),
