@@ -15,7 +15,7 @@ def run(_c):
         for b in occ.component.bRepBodies:
             if not b.name.startswith("BOUGHT_"):
                 stl(b, b.name)
-    fc = next(o for o in root.occurrences if o.component.name == "FitCoupon")
+    fc = next(o for o in root.occurrences if o.component.name == "BenchMount")
     for b in fc.component.bRepBodies:
-        stl(b, "FitCoupon")
+        stl(b, "BenchMount")
     print(names)

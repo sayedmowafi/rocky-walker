@@ -1,5 +1,5 @@
 """Rocky Walker / Fusion step 02: the leg (coxa bracket, femur, tibia, bought-part placeholders,
-revolute joints, fit coupon).
+revolute joints, bench mount).
 
 Geometry is computed from the Fusion user parameters at run time; re-running this script
 rebuilds the leg from the current parameter values (it deletes the previous leg parts first).
@@ -45,10 +45,11 @@ def run(_context: str):
     IDL = 5.0  # idler arm thickness (bearing side, 1 mm floor behind the bearing)
     GAP = 0.5  # running gap between parts
     # idler pivot: M3x8 screw, head in a recess in the idler arm clamping only the bearing inner
-    # ring against a boss on the cradle floor, threaded into that floor (no nut: the servo base
-    # sits right behind it). Boss height = idler gap, so arm and floor never rub.
-    IGAP = 1.0  # cradle floor to idler arm
-    BOSS_R = 3.0  # touches the inner ring only (623 outer ring bore is ~8 mm)
+    # ring against two M3 washers on the cradle floor, threaded into that floor (no nut: the servo
+    # base sits right behind it). Washer stack = idler gap, so arm and floor never rub; the floor
+    # stays flat so cradles print floor-down without supports.
+    IGAP = 1.0  # cradle floor to idler arm = 2 x 0.5 mm M3 washers
+    M4P = mm("m4_pilot")  # servo ear screws self-tap into solid ear blocks
     HEAD_R = 3.3  # M3 socket/button head (5.5-5.7 mm) clearance; leaves a 1.7 mm bearing lip
     HUB = 13.0  # hub radius around joint axes
 
@@ -151,24 +152,23 @@ def run(_context: str):
     ear_holes = [(ear_cx + sx * EP / 2, sy * EG / 2) for sx in (-1, 1) for sy in (-1, 1)]
 
     def cradle(origin, zdir, xdir):
-        """Printed servo cradle in servo-local frame: walls around the body, a floor under
-        the servo base (with the idler bolt hole on the shaft axis), and an ear plate under the
-        ears with M3 holes + hex nut pockets. Open on the shaft side."""
+        """Printed servo cradle in servo-local frame: walls around the body, a flat floor under
+        the servo base (idler screw pilot on the shaft axis), and solid ear blocks from the floor
+        up to the ears, so nothing overhangs and it prints support-free floor-down or on a side.
+        The M4 ear screws self-tap into pilots in the blocks. Open on the shaft side."""
         o = C + WALL
         floor_z0 = -SH - C - WALL
         body = box(-SO - o, SL - SO + o, -SW / 2 - o, SW / 2 + o, floor_z0, -SH + EZ)
-        plate = box(ear_cx - EL / 2 - 2, ear_cx + EL / 2 + 2, -SW / 2 - o, SW / 2 + o, -SH + EZ - WALL, -SH + EZ)
-        c = uni(body, plate)
+        blocks = box(ear_cx - EL / 2 - 2, ear_cx + EL / 2 + 2, -SW / 2 - o, SW / 2 + o, floor_z0, -SH + EZ)
+        c = uni(body, blocks)
         pocket = box(-SO - C, SL - SO + C, -SW / 2 - C, SW / 2 + C, -SH - C, 10)
         cut(c, pocket)
         # open-topped slot in the shaft-end wall for the cable-exit block and its straight cable
         cut(c, box(-SO - LOUT - LSTIFF - 1, -SO + 0.01, -LW / 2 - C, LW / 2 + C,
                    -SH + LZ - LH / 2 - C, 10))
-        c = uni(c, cyl((0, 0, floor_z0 - IGAP), (0, 0, floor_z0 + 0.01), BOSS_R))  # idler boss
-        cut(c, cyl((0, 0, floor_z0 - IGAP - 1), (0, 0, -SH + 1), M3P / 2))  # idler screw pilot
+        cut(c, cyl((0, 0, floor_z0 - 1), (0, 0, -SH + 1), M3P / 2))  # idler screw pilot
         for hx, hy in ear_holes:
-            cut(c, cyl((hx, hy, -SH + EZ - WALL - 1), (hx, hy, -SH + EZ + 1), M4 / 2))
-            cut(c, hexprism((hx, hy, -SH + EZ - WALL - 0.01), "z", NAF4, NT4))
+            cut(c, cyl((hx, hy, -SH + EZ - 16), (hx, hy, -SH + EZ + 1), M4P / 2))
         return place(c, origin, zdir, xdir)
 
     def horn_holes(center_axis_p0, axis, length):
@@ -213,22 +213,36 @@ def run(_context: str):
     o = C + WALL
     cr_x0, cr_x1 = LC - SW / 2 - o, LC + SW / 2 + o
     top_z0, top_z1 = coxa_arm_z0, coxa_arm_z0 + ARM
-    bot_z1 = coxa_top - SH - C - WALL - GAP  # under the chassis bottom plate (WALL thick)
+    bot_z1 = coxa_top - SH - C - WALL - IGAP  # under the hip-yaw pocket floor + 2 washers
     bot_z0 = bot_z1 - IDL
     cr_y0, cr_y1 = floor_y, -SH / 2 + EZ  # cradle y range (floor .. ear plate top)
+    def hub_web(z0, z1):
+        """Solid web between the arm's hub and the cradle-floor plane, bounded by a 45-degree
+        line tangent to the hub, so the bracket prints lying on its cradle floor with nothing
+        overhanging. Lies in the arm's own layer (above/below the body)."""
+        import math
+
+        t = HUB / math.sqrt(2)  # 45-degree tangent point on the hub at (-t, -t)
+        # everything above the 45-degree line (toward the hub), clipped to the floor plane
+        web = place(box(-40, 80, 0, 60, z0, z1), (-t, -t, 0), (0, 0, 1), (t / HUB, -t / HUB, 0))
+        tbm.booleanOperation(web, box(-t, cr_x0 + 0.5, cr_y0, 0, z0, z1), INTER)
+        return web
+
     top_arm = uni(
         cyl((0, 0, top_z0), (0, 0, top_z1), HUB),
+        hub_web(top_z0, top_z1),
         box(0, cr_x1, -HUB, HUB, top_z0, top_z1),
         box(cr_x0, cr_x1, cr_y0, cr_y1, top_z0, top_z1),
     )
     cut(top_arm, *horn_holes((0, 0, top_z0 - 1), "z", ARM + 2))
     bot_arm = uni(
         cyl((0, 0, bot_z0), (0, 0, bot_z1), HUB),
+        hub_web(bot_z0, bot_z1),
         box(0, cr_x1, -HUB, cr_y1, bot_z0, bot_z1),  # stays below the femur servo's ears
         box(cr_x0, cr_x1, cr_y0, cr_y1, bot_z0, bot_z1),
     )
     cut(bot_arm, cyl((0, 0, bot_z1 - BW), (0, 0, bot_z1 + 1), BOD / 2))
-    cut(bot_arm, cyl((0, 0, bot_z0 - 1), (0, 0, bot_z1), BID / 2 + 0.6))
+    cut(bot_arm, cyl((0, 0, bot_z0 - 1), (0, 0, bot_z1), HEAD_R))  # pivot screw head recess
     column = box(cr_x0, cr_x0 + WALL, cr_y0, cr_y1, bot_z0, top_z1)
     # femur servo pocket must stay clear in the column/arms region
     coxa_bracket = uni(fc, top_arm, bot_arm, column)
@@ -291,15 +305,28 @@ def run(_context: str):
         cut(groove, cyl((x - 0.5, 0, 0), (x + 0.5, 0, 0), spine_r(x) + CAP_T - 0.6))
         cut(cap, groove)
 
-    # ---------- fit coupon (separate printable part, placed beside the leg) ----------
-    coupon = cradle((0, -120, 0), (0, 0, 1), (1, 0, 0))
-    cp = uni(
-        coupon,
-        box(-15, 40, -150, -138, -SH - C - WALL, -SH - C - WALL + 5),
-    )
-    cut(cp, cyl((5, -144, -SH - 20), (5, -144, 0), BOD / 2))  # bearing seat test (through)
-    for h in horn_holes((25, -144, -SH - 20), "z", 40):
-        cut(cp, h)
+    # ---------- bench mount (stands in for the body on the bench) ----------
+    # The hip-yaw servo's pocket exactly as the body will hold it, plus a tail that clamps to a
+    # desk edge. The coxa's lower bearing pivots on an M3x8 + 2 washers into this pocket's floor,
+    # so the leg hangs between the servo horn (top) and the pivot (bottom), never off the spline
+    # alone. The tail stays behind x = -26 so nothing on the leg sweeps into it at +-45 deg yaw;
+    # put the tail's front face on the desk edge so the leg hangs over the edge.
+    TAIL_X0, TAIL_X1, TAIL_T = -95.0, -26.0, 8.0
+    mount = cradle(*coxa_servo_frame)
+    m_floor = coxa_top - SH - C - WALL
+    m_rim = coxa_top - SH + EZ  # top of the pocket walls / ear blocks
+    # the tail is an open-topped box up to the rim, so the mount prints upside down (rim on the
+    # plate) with only short bridges: pocket floor and tail plate span ~20 mm between walls
+    pocket_back = -(ear_cx + EL / 2 + 2)  # leg x of the pocket's back ear block
+    tail = box(TAIL_X0, pocket_back + 0.01, -SW / 2 - o, SW / 2 + o, m_floor - TAIL_T, m_rim)
+    cut(tail, box(TAIL_X0 + WALL, pocket_back, -SW / 2 - o + WALL, SW / 2 + o - WALL,
+                  m_floor - TAIL_T + 5.0, m_rim + 1))  # 5 mm clamp plate, 3 mm walls
+    # under the pocket's back end only a plate (the servo sits above it); stops short of the
+    # leg's sweep
+    tail = uni(tail, box(pocket_back, TAIL_X1, -SW / 2 - o, SW / 2 + o, m_floor - TAIL_T, m_floor + 0.01))
+    mount = uni(mount, tail)
+    for hx in (-50.0, -80.0):  # clamp / wood-screw holes through the tail
+        cut(mount, cyl((hx, 0, m_floor - TAIL_T - 1), (hx, 0, m_floor + 50), 2.25))
 
     # ---------- write into Fusion ----------
     leg_occ = next(o for o in root.occurrences if o.component.name == "Leg")
@@ -309,7 +336,7 @@ def run(_context: str):
     for occ in list(leg.occurrences):
         occ.deleteMe()
     for o2 in list(root.occurrences):
-        if o2.component.name == "FitCoupon":
+        if o2.component.name in ("FitCoupon", "BenchMount"):
             o2.deleteMe()
 
     lib = app.materialLibraries.itemByName("Fusion Appearance Library")
@@ -384,8 +411,9 @@ def run(_context: str):
             ("BOUGHT_bearing_knee", bearing((knee_x, idl_y1 - BW, 0), (knee_x, idl_y1, 0)), "silver"),
         ],
     )
-    coupon_occ = add_component(root, "FitCoupon", [("FitCoupon", cp, "white")])
-    coupon_occ.isLightBulbOn = False
+    tbm.transform(mount, leg_occ.transform)  # built in leg coordinates; sit it where the leg is
+    mount_occ = add_component(root, "BenchMount", [("BenchMount", mount, "white")])
+    mount_occ.isLightBulbOn = False
 
     # ---------- joints (axes on the skeleton) ----------
     sk = leg.sketches.itemByName("joints")

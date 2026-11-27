@@ -78,10 +78,10 @@ def run(_context: str):
             if not b.name.startswith("BOUGHT_"):
                 stl(b, os.path.join(stl_dir, f"{b.name}.stl"), HIGH)
                 printed.append(b.name)
-    coupon = next(o for o in root.occurrences if o.component.name == "FitCoupon")
+    coupon = next(o for o in root.occurrences if o.component.name == "BenchMount")
     for b in coupon.component.bRepBodies:
-        stl(b, os.path.join(stl_dir, "FitCoupon.stl"), HIGH)
-        printed.append("FitCoupon")
+        stl(b, os.path.join(stl_dir, "BenchMount.stl"), HIGH)
+        printed.append("BenchMount")
 
     with open(os.path.join(mesh_dir, "manifest.json"), "w") as f:
         json.dump({"units": "mm", "parts": parts}, f, indent=2)

@@ -46,6 +46,9 @@ def run(_context: str):
         for occ in leg_occ.childOccurrences:
             for b in occ.bRepBodies:
                 out.append(b)
+        for occ in root.occurrences:  # the bench mount holds the leg like the body does
+            if occ.component.name == "BenchMount":
+                out.extend(occ.bRepBodies)
         return out
 
     def interference():

@@ -80,7 +80,7 @@ uv run mjpython -m rocky.sim walk --vx 0.03 --viewer       # interactive 3D view
 Everything for printing is in [`cad/`](cad/):
 
 - `cad/stl/`: one STL per printed part (Coxa, Femur, Tibia ×5; ChassisTop, ChassisBottom, BatteryTray, Deck, Carapace ×1). They're exported in assembly orientation, so use your slicer's "lay on face" to put each part flat. PLA, 0.2 mm layers, at least 4 walls, 30–40% infill. Every part fits a 180 mm bed.
-- `cad/stl/FitCoupon.stl`: **print this first** to check servo, bearing and nut fit (tune `fit_clearance`).
+- `cad/stl/plates/print1-hip/plate.3mf`: **print this first**: hip bracket + bench mount, support-free (see `docs/assembly/test-leg.md`).
 - `cad/rocky.f3d` is the editable Fusion 360 source; `cad/rocky.step` opens in any CAD tool.
 - Parts list: [docs/bom.md](docs/bom.md).
 

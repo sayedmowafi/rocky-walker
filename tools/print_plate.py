@@ -19,17 +19,22 @@ import trimesh
 GAP = 6.0  # mm between parts and to the plate edge
 
 
-def best_orientation(mesh: trimesh.Trimesh) -> trimesh.Trimesh:
-    """Put the convex-hull facet with the most real contact area on the plate (z = 0)."""
+def best_orientation(mesh: trimesh.Trimesh, down=None) -> trimesh.Trimesh:
+    """Put the convex-hull facet with the most real contact area on the plate (z = 0), or the
+    facet whose outward normal is ``down`` when the part was designed to print a specific way."""
     hull = mesh.convex_hull
     best = None
     for normal, origin in zip(hull.facets_normal, hull.facets_origin, strict=True):
+        if down is not None and normal @ np.asarray(down, float) < 0.999:
+            continue
         dist = (mesh.vertices - origin) @ normal
         tri_d = dist[mesh.faces]
         on_plane = (np.abs(tri_d) < 0.05).all(axis=1) & (mesh.face_normals @ normal > 0.999)
         contact = mesh.area_faces[on_plane].sum()
         if best is None or contact > best[0]:
             best = (contact, normal)
+    if best is None:
+        raise SystemExit(f"no flat face points {down}")
     m = mesh.copy()
     m.apply_transform(trimesh.geometry.align_vectors(best[1], [0, 0, -1]))
     # spin about z for the smallest footprint
@@ -79,12 +84,15 @@ def main():
     ap.add_argument("--bed", nargs=2, type=float, default=(180, 180))
     ap.add_argument("--height", type=float, default=180)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--down", action="append", default=[], metavar="PART=X,Y,Z",
+                    help="put this part's face with outward normal X,Y,Z on the plate")
     ap.add_argument("stls", nargs="+", type=Path)
     a = ap.parse_args()
+    downs = {k: [float(v) for v in xyz.split(",")] for k, xyz in (d.split("=") for d in a.down)}
     a.out.mkdir(parents=True, exist_ok=True)
     parts = []
     for p in a.stls:
-        m, contact = best_orientation(trimesh.load_mesh(p))
+        m, contact = best_orientation(trimesh.load_mesh(p), downs.get(p.stem))
         ext = m.extents
         print(f"{p.stem:10s} footprint {ext[0]:6.1f} x {ext[1]:6.1f}  height {ext[2]:6.1f}  "
               f"flat contact {contact:7.0f} mm2")

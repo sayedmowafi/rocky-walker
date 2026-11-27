@@ -22,7 +22,7 @@ def read_stl(path: Path) -> np.ndarray:
 def test_printable_stls_fit_bed():
     printed = set(json.loads((CAD / "reports" / "leg.json").read_text())["printed"])
     printed |= set(json.loads((CAD / "reports" / "body.json").read_text())["printed"])
-    printed.add("FitCoupon")
+    printed.add("BenchMount")
     for name in printed:
         path = CAD / "stl" / f"{name}.stl"
         assert path.exists(), f"missing {path}"
