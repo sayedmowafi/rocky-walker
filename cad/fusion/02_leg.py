@@ -152,6 +152,12 @@ def run(_context: str):
     # ear screw positions in servo-local frame (ear plane underside at Z = -SH + EZ)
     ear_holes = [(ear_cx + sx * EP / 2, sy * EG / 2) for sx in (-1, 1) for sy in (-1, 1)]
 
+    def ear_pilots(frame):
+        """M4 self-tap pilots for the four servo ears, 16 mm deep (placed if `frame` is given).
+        Re-cut after joining arms onto a cradle so no arm or bridge ever half-fills them."""
+        out = [cyl((hx, hy, -SH + EZ - 16), (hx, hy, -SH + EZ + 1), M4P / 2) for hx, hy in ear_holes]
+        return [place(c, *frame) for c in out] if frame else out
+
     def cradle(origin, zdir, xdir):
         """Printed servo cradle in servo-local frame: walls around the body, a flat floor under
         the servo base (idler screw pilot on the shaft axis), and solid ear blocks from the floor
@@ -168,8 +174,7 @@ def run(_context: str):
         cut(c, box(-SO - LOUT - LSTIFF - 1, -SO + 0.01, -LW / 2 - C, LW / 2 + C,
                    -SH + LZ - LH / 2 - C, 10))
         cut(c, cyl((0, 0, floor_z0 - 1), (0, 0, -SH + 1), M3P / 2))  # idler screw pilot
-        for hx, hy in ear_holes:
-            cut(c, cyl((hx, hy, -SH + EZ - 16), (hx, hy, -SH + EZ + 1), M4P / 2))
+        cut(c, *ear_pilots(None))
         return place(c, origin, zdir, xdir)
 
     def horn_holes(center_axis_p0, axis, length):
@@ -250,6 +255,7 @@ def run(_context: str):
     column = box(cr_x0, cr_x0 + WALL, cr_y0, cr_y1, bot_z0, top_z1)
     # femur servo pocket must stay clear in the column/arms region
     coxa_bracket = uni(fc, top_arm, bot_arm, column)
+    cut(coxa_bracket, *ear_pilots(femur_servo_frame))  # the lower arm overlaps the ear block
     cut(coxa_bracket, box(cr_x0 + WALL, cr_x1 - WALL, cr_y0 + WALL, 60, -(SL - SO) - C, SO + C))
     # the femur servo's cable leaves its shaft end pointing up: slot it through the top arm so it
     # exits on top of the bracket and runs back toward the body along the arm
@@ -284,6 +290,7 @@ def run(_context: str):
     cut(femur, box(ear_x0 - GAP, kc_x0 + 1.5, -SH / 2 + EZ, 60, -SW / 2 - C - 0.5, SW / 2 + C + 0.5))
     # keep the knee servo pocket clear of the bridge
     cut(femur, box(knee_x - SL + SO - C, knee_x + SO + C, -SH / 2 - C, 60, -SW / 2 - C, SW / 2 + C))
+    cut(femur, *ear_pilots(knee_servo_frame))  # the bridge overlaps the hip-side ear block
 
     # ---------- tibia ----------
     t_horn, t_idl = driven_arms(knee_x, 38.0, 10.0)
