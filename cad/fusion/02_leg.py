@@ -33,6 +33,8 @@ def run(_context: str):
     EL, EP, EG = mm("servo_ear_l"), mm("servo_ear_hole_pitch"), mm("servo_ear_hole_gap")
     EZ, ET, SO, SS = mm("servo_ear_z"), mm("servo_ear_t"), mm("servo_shaft_offset"), mm("servo_shaft_h")
     C, WALL = mm("fit_clearance"), mm("wall")
+    LW, LH, LZ = mm("servo_lead_w"), mm("servo_lead_h"), mm("servo_lead_z")
+    LOUT, LSTIFF = mm("servo_lead_out"), mm("servo_lead_stiff")
     M3, NAF, NT = mm("m3_clear"), mm("m3_nut_af"), mm("m3_nut_t")
     M4, NAF4, NT4 = mm("m4_clear"), mm("m4_nut_af"), mm("m4_nut_t")  # servo ear screws
     BOD, BID, BW = mm("bearing_od"), mm("bearing_id"), mm("bearing_w")
@@ -126,7 +128,10 @@ def run(_context: str):
         b = box(-SO, SL - SO, -SW / 2, SW / 2, -SH, 0)
         ears = box(ear_cx - EL / 2, ear_cx + EL / 2, -SW / 2, SW / 2, -SH + EZ, -SH + EZ + ET)
         spline = cyl((0, 0, 0), (0, 0, SS - HT), 3.0)
-        return place(uni(b, ears, spline), origin, zdir, xdir)
+        # cable-exit block on the shaft-end face near the base, plus the straight stretch of
+        # cable before it can bend (modelled solid so nothing printed may occupy that space)
+        lead = box(-SO - LOUT - LSTIFF, -SO, -LW / 2, LW / 2, -SH + LZ - LH / 2, -SH + LZ + LH / 2)
+        return place(uni(b, ears, spline, lead), origin, zdir, xdir)
 
     def horn(origin, zdir, xdir):
         return place(cyl((0, 0, SS - HT), (0, 0, SS), HD / 2), origin, zdir, xdir)
@@ -148,6 +153,9 @@ def run(_context: str):
         c = uni(body, plate)
         pocket = box(-SO - C, SL - SO + C, -SW / 2 - C, SW / 2 + C, -SH - C, 10)
         cut(c, pocket)
+        # open-topped slot in the shaft-end wall for the cable-exit block and its straight cable
+        cut(c, box(-SO - LOUT - LSTIFF - 1, -SO + 0.01, -LW / 2 - C, LW / 2 + C,
+                   -SH + LZ - LH / 2 - C, 10))
         cut(c, cyl((0, 0, floor_z0 - 1), (0, 0, -SH + 1), M3 / 2))  # idler bolt
         for hx, hy in ear_holes:
             cut(c, cyl((hx, hy, -SH + EZ - WALL - 1), (hx, hy, -SH + EZ + 1), M4 / 2))
@@ -216,6 +224,11 @@ def run(_context: str):
     # femur servo pocket must stay clear in the column/arms region
     coxa_bracket = uni(fc, top_arm, bot_arm, column)
     cut(coxa_bracket, box(cr_x0 + WALL, cr_x1 - WALL, cr_y0 + WALL, 60, -(SL - SO) - C, SO + C))
+    # the femur servo's cable leaves its shaft end pointing up: slot it through the top arm so it
+    # exits on top of the bracket and runs back toward the body along the arm
+    lead_y = -SH / 2 + LZ
+    cut(coxa_bracket, box(LC - LW / 2 - C, LC + LW / 2 + C, lead_y - LH / 2 - C, lead_y + LH / 2 + C,
+                          SO, top_z1 + 1))
 
     # ---------- femur ----------
     def driven_arms(axis_x, length, half_w):
