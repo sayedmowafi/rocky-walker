@@ -220,14 +220,15 @@ def run(_context: str):
     bot_z0 = bot_z1 - IDL
     cr_y0, cr_y1 = floor_y, -SH / 2 + EZ  # cradle y range (floor .. ear plate top)
     def hub_web(z0, z1):
-        """Solid web between the arm's hub and the cradle-floor plane, bounded by a 45-degree
-        line tangent to the hub, so the bracket prints lying on its cradle floor with nothing
-        overhanging. Lies in the arm's own layer (above/below the body)."""
+        """45-degree strut from the arm's hub down to the cradle-floor plane, so the bracket prints
+        lying on its cradle floor without supports. Lies in the arm's own layer."""
         import math
 
         t = HUB / math.sqrt(2)  # 45-degree tangent point on the hub at (-t, -t)
-        # everything above the 45-degree line (toward the hub), clipped to the floor plane
-        web = place(box(-40, 80, 0, 60, z0, z1), (-t, -t, 0), (0, 0, 1), (t / HUB, -t / HUB, 0))
+        # a 6.5 mm strut along the 45-degree line, from the hub down to the floor plane: the arm's
+        # edge beyond it bridges to the cradle, and the strut stays within 27 mm of the coxa axis
+        # so it never sweeps into the body's side panels at full yaw
+        web = place(box(-40, 80, 0, 6.5, z0, z1), (-t, -t, 0), (0, 0, 1), (t / HUB, -t / HUB, 0))
         tbm.booleanOperation(web, box(-t, cr_x0 + 0.5, cr_y0, 0, z0, z1), INTER)
         return web
 
@@ -404,7 +405,7 @@ def run(_context: str):
         leg,
         "Femur",
         [
-            ("Femur", femur, "blue"),
+            ("Femur", femur, "black"),
             ("BOUGHT_MG996R_knee", servo(*knee_servo_frame), "grey"),
             ("BOUGHT_horn_femur", horn(*femur_servo_frame), "silver"),
             ("BOUGHT_bearing_femur", bearing((LC, idl_y1 - BW, 0), (LC, idl_y1, 0)), "silver"),
@@ -414,14 +415,14 @@ def run(_context: str):
         leg,
         "Tibia",
         [
-            ("Tibia", tibia, "blue"),
+            ("Tibia", tibia, "black"),
             ("FootCap", cap, "black"),
             ("BOUGHT_horn_knee", horn(*knee_servo_frame), "silver"),
             ("BOUGHT_bearing_knee", bearing((knee_x, idl_y1 - BW, 0), (knee_x, idl_y1, 0)), "silver"),
         ],
     )
     tbm.transform(mount, leg_occ.transform)  # built in leg coordinates; sit it where the leg is
-    mount_occ = add_component(root, "BenchMount", [("BenchMount", mount, "white")])
+    mount_occ = add_component(root, "BenchMount", [("BenchMount", mount, "black")])
     mount_occ.isLightBulbOn = False
 
     # ---------- joints (axes on the skeleton) ----------

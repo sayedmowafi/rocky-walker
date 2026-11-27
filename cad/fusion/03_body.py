@@ -34,14 +34,17 @@ def run(_context: str):
     SL, SW, SH = mm("servo_l"), mm("servo_w"), mm("servo_h")
     EL, EP, EG = mm("servo_ear_l"), mm("servo_ear_hole_pitch"), mm("servo_ear_hole_gap")
     EZ, SO, SS = mm("servo_ear_z"), mm("servo_shaft_offset"), mm("servo_shaft_h")
+    HTOP = mm("horn_top_h")  # aluminium horn disc top above the servo case top
     C, WALL = mm("fit_clearance"), mm("wall")
+    LW, LH, LZ = mm("servo_lead_w"), mm("servo_lead_h"), mm("servo_lead_z")
+    LOUT, LSTIFF = mm("servo_lead_out"), mm("servo_lead_stiff")
     M3, NAF, NT = mm("m3_clear"), mm("m3_nut_af"), mm("m3_nut_t")
     M4, NAF4, NT4, M4P = mm("m4_clear"), mm("m4_nut_af"), mm("m4_nut_t"), mm("m4_pilot")
     N = 5
     PSI = [2 * math.pi * i / N for i in range(N)]
 
     # must match 02_leg.py
-    coxa_top = 21.0 - SS
+    coxa_top = 21.0 - HTOP  # the coxa top arm sits on the horn disc at z = 21
     ear_z = coxa_top - SH + EZ  # coxa servo ear underside
     base_z = coxa_top - SH  # coxa servo base
     ear_cx = SL / 2 - SO
@@ -224,6 +227,9 @@ def run(_context: str):
         # pillar under the servo's outer ears (self-tapping servo screws)
         tbm.booleanOperation(
             tub, at_leg(box(SO + C + 0.2, CHEEK_R - TW + 0.5, -8.5, 8.5, Z_F1, Z_D1), i), UNION)
+        # open-topped slot through the pillar for the servo's cable exit (it drops in from above)
+        cut(tub, at_leg(box(SO - 0.01, SO + LOUT + LSTIFF + 1, -LW / 2 - C, LW / 2 + C,
+                            base_z + LZ - LH / 2 - C, Z_D1 + 1), i))
         for hx, hy in ear_holes:
             if hx > 0:
                 cut(tub, at_leg(cyl((hx, hy, Z_D1 - 14), (hx, hy, Z_D1 + 1), M4P / 2), i))
@@ -439,9 +445,9 @@ def run(_context: str):
 
     add_component("Chassis", [(f"ChassisTub_{i + 1}", tubs[i], "Rocky Black") for i in range(N)]
                   + [("ChassisTop", disc, "Rocky Black"), ("BatteryHatch", hatch, "Rocky Black")])
-    add_component("Carapace", [(f"Carapace_{i + 1}", wedges[i], "Rocky White") for i in range(N)]
-                  + [("CarapaceRing", ring, "Rocky Black"), ("CarapaceCap", cap, "Rocky White")]
-                  + [(f"RockFace_{k + 1}", panels[k], "Rocky White") for k in range(N)])
+    add_component("Carapace", [(f"Carapace_{i + 1}", wedges[i], "Rocky Black") for i in range(N)]
+                  + [("CarapaceRing", ring, "Rocky Black"), ("CarapaceCap", cap, "Rocky Black")]
+                  + [(f"RockFace_{k + 1}", panels[k], "Rocky Black") for k in range(N)])
     parts = [("BOUGHT_pi5", pi5), ("BOUGHT_respeaker", respeaker), ("BOUGHT_speaker", speaker),
              ("BOUGHT_camera", camera), ("BOUGHT_pca9685", pca), ("BOUGHT_lipo", lipo),
              ("BOUGHT_xl4005", xl4005), ("BOUGHT_ina219", ina219), ("BOUGHT_fuse", fuse),

@@ -3,27 +3,27 @@
   "interference_neutral": [],
   "leg_mounts_r_deg_z": [
     [
-      70.0,
+      100.0,
       0.0,
       0.0
     ],
     [
-      70.0,
+      100.0,
       72.0,
       0.0
     ],
     [
-      70.0,
+      100.0,
       144.0,
       0.0
     ],
     [
-      70.0,
+      100.0,
       216.0,
       0.0
     ],
     [
-      70.0,
+      100.0,
       288.0,
       0.0
     ]
@@ -42,23 +42,35 @@
     "femur_min_deg": -40.0,
     "femur_mm": 70.0,
     "fit_clearance": 0.3,
-    "horn_bolt_circle": 14.0,
+    "horn_bolt_circle": 13.8,
     "horn_d": 20.0,
+    "horn_screw_clear": 3.6,
     "horn_t": 2.5,
+    "horn_top_h": 8.45,
     "m3_clear": 3.4,
     "m3_nut_af": 5.6,
     "m3_nut_t": 2.6,
-    "mount_radius_mm": 70.0,
-    "servo_ear_hole_gap": 10.0,
-    "servo_ear_hole_pitch": 49.5,
-    "servo_ear_l": 54.6,
-    "servo_ear_t": 2.5,
-    "servo_ear_z": 29.0,
-    "servo_h": 42.9,
-    "servo_l": 40.7,
-    "servo_shaft_h": 5.0,
-    "servo_shaft_offset": 10.2,
-    "servo_w": 19.7,
+    "m3_pilot": 2.5,
+    "m4_clear": 4.4,
+    "m4_nut_af": 7.2,
+    "m4_nut_t": 3.4,
+    "m4_pilot": 3.7,
+    "mount_radius_mm": 100.0,
+    "servo_ear_hole_gap": 10.5,
+    "servo_ear_hole_pitch": 49.4,
+    "servo_ear_l": 54.0,
+    "servo_ear_t": 2.4,
+    "servo_ear_z": 28.4,
+    "servo_h": 38.55,
+    "servo_l": 40.3,
+    "servo_lead_h": 4.6,
+    "servo_lead_out": 4.0,
+    "servo_lead_stiff": 8.0,
+    "servo_lead_w": 7.2,
+    "servo_lead_z": 6.5,
+    "servo_shaft_h": 5.65,
+    "servo_shaft_offset": 9.75,
+    "servo_w": 19.9,
     "tibia_max_deg": -20.0,
     "tibia_min_deg": -135.0,
     "tibia_mm": 100.0,
@@ -95,48 +107,56 @@
     "BOUGHT_ubec_4": 0.012,
     "BOUGHT_ubec_5": 0.012,
     "BOUGHT_xl4005": 0.015,
-    "Belly": 0.026,
-    "BellyHatch": 0.0302,
-    "Carapace": 0.0509,
-    "ChassisBottom": 0.0429,
-    "ChassisTop": 0.0266,
-    "Coxa": 0.0222,
-    "Deck": 0.0386,
-    "Femur": 0.0246,
+    "BatteryHatch": 0.0074,
+    "CarapaceCap": 0.0085,
+    "CarapaceRing": 0.0066,
+    "Carapace_1": 0.0201,
+    "Carapace_2": 0.0199,
+    "Carapace_3": 0.0199,
+    "Carapace_4": 0.0196,
+    "Carapace_5": 0.0199,
+    "ChassisTop": 0.0509,
+    "ChassisTub_1": 0.0304,
+    "ChassisTub_2": 0.0318,
+    "ChassisTub_3": 0.0311,
+    "ChassisTub_4": 0.0305,
+    "ChassisTub_5": 0.0321,
+    "Coxa": 0.0259,
+    "Femur": 0.027,
     "FootCap": 0.0017,
-    "SidePanel_1": 0.0048,
-    "SidePanel_2": 0.0048,
-    "SidePanel_3": 0.0048,
-    "SidePanel_4": 0.0048,
-    "SidePanel_5": 0.0048,
+    "RockFace_1": 0.0031,
+    "RockFace_2": 0.003,
+    "RockFace_3": 0.003,
+    "RockFace_4": 0.0033,
+    "RockFace_5": 0.0033,
     "Tibia": 0.0238
   },
   "segments": {
     "coxa": {
       "com_mm": [
         34.11,
-        -1.75,
-        -7.37
+        -1.85,
+        -7.68
       ],
-      "kg": 0.0852
+      "kg": 0.0889
     },
     "femur": {
       "com_mm": [
-        48.88,
-        -0.69,
+        49.49,
+        -0.38,
         0.0
       ],
-      "kg": 0.0876
+      "kg": 0.09
     },
     "tibia": {
       "com_mm": [
-        32.02,
-        2.4,
+        31.97,
+        3.51,
         0.0
       ],
       "kg": 0.0335
     }
   },
-  "torso_kg": 1.008,
-  "total_kg": 2.0395
+  "torso_kg": 1.1133,
+  "total_kg": 2.1753
 }

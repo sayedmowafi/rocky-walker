@@ -15,9 +15,14 @@ def report():
     return json.loads(REPORT.read_text())
 
 
-PRINTED = {"ChassisTop", "ChassisBottom", "Deck", "Carapace", "Belly", "BellyHatch"} | {
-    f"SidePanel_{i}" for i in range(1, 6)
-}
+# wide, single-layer body: a 5-piece chassis tub + top plate + battery hatch, and a faceted
+# carapace in 5 wedges + keystone ring + cap, with 5 rock faces over the flanks
+PRINTED = (
+    {"ChassisTop", "BatteryHatch", "CarapaceRing", "CarapaceCap"}
+    | {f"ChassisTub_{i}" for i in range(1, 6)}
+    | {f"Carapace_{i}" for i in range(1, 6)}
+    | {f"RockFace_{i}" for i in range(1, 6)}
+)
 # every part in docs/bom.md that lives in the body
 COMPONENTS = (
     {
