@@ -40,6 +40,7 @@ def run(_context: str):
     BOD, BID, BW = mm("bearing_od"), mm("bearing_id"), mm("bearing_w")
     HD, HT, HBC = mm("horn_d"), mm("horn_t"), mm("horn_bolt_circle")
     HSC = mm("horn_screw_clear")
+    HTOP = mm("horn_top_h")  # the printed arm sits on the horn disc's top face
     M3P = mm("m3_pilot")
     ARM = 4.0  # driven arm plate thickness (horn side)
     IDL = 5.0  # idler arm thickness (bearing side, 1 mm floor behind the bearing)
@@ -136,14 +137,14 @@ def run(_context: str):
     def servo(origin, zdir, xdir):
         b = box(-SO, SL - SO, -SW / 2, SW / 2, -SH, 0)
         ears = box(ear_cx - EL / 2, ear_cx + EL / 2, -SW / 2, SW / 2, -SH + EZ, -SH + EZ + ET)
-        spline = cyl((0, 0, 0), (0, 0, SS - HT), 3.0)
+        spline = cyl((0, 0, 0), (0, 0, SS), 3.0)
         # cable-exit block on the shaft-end face near the base, plus the straight stretch of
         # cable before it can bend (modelled solid so nothing printed may occupy that space)
         lead = box(-SO - LOUT - LSTIFF, -SO, -LW / 2, LW / 2, -SH + LZ - LH / 2, -SH + LZ + LH / 2)
         return place(uni(b, ears, spline, lead), origin, zdir, xdir)
 
     def horn(origin, zdir, xdir):
-        return place(cyl((0, 0, SS - HT), (0, 0, SS), HD / 2), origin, zdir, xdir)
+        return place(cyl((0, 0, HTOP - HT), (0, 0, HTOP), HD / 2), origin, zdir, xdir)
 
     def bearing(p0, p1):
         return cut(cyl(p0, p1, BOD / 2), cyl(p0, p1, BID / 2))
@@ -195,13 +196,13 @@ def run(_context: str):
     y_top = SH / 2  # servos on the femur and knee axes are centred on y = 0
     # coxa servo: vertical, shaft +z on the coxa axis, body toward the body centre (-x)
     coxa_arm_z0 = 21.0  # underside of the coxa bracket's top arm = coxa horn top
-    coxa_top = coxa_arm_z0 - SS
+    coxa_top = coxa_arm_z0 - HTOP
     coxa_servo_frame = ((0, 0, coxa_top), (0, 0, 1), (-1, 0, 0))
     femur_servo_frame = ((LC, y_top, 0), (0, 1, 0), (0, 0, -1))  # body hangs below the axis
     knee_x = LC + LF
     knee_servo_frame = ((knee_x, y_top, 0), (0, 1, 0), (-1, 0, 0))  # body toward the hip
 
-    arm_y0 = y_top + SS  # horn-side arm inner face
+    arm_y0 = y_top + HTOP  # horn-side arm inner face = horn disc top
     arm_y1 = arm_y0 + ARM
     floor_y = -SH / 2 - C - WALL  # cradle floor outer face (servo-side idler)
     idl_y1 = floor_y - IGAP

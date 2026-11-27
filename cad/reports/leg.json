@@ -67,6 +67,7 @@
     "horn_d": 20.0,
     "horn_screw_clear": 3.6,
     "horn_t": 2.5,
+    "horn_top_h": 8.45,
     "m3_clear": 3.4,
     "m3_nut_af": 5.6,
     "m3_nut_t": 2.6,
@@ -103,15 +104,15 @@
         35.57,
         64.4
       ],
-      "volume_mm3": 37376.1
+      "volume_mm3": 37571.8
     },
     "Femur": {
       "bbox_mm": [
         101.6,
-        57.5,
+        60.3,
         26.5
       ],
-      "volume_mm3": 36933.5
+      "volume_mm3": 37266.7
     },
     "FootCap": {
       "bbox_mm": [
@@ -124,10 +125,10 @@
     "Tibia": {
       "bbox_mm": [
         112.73,
-        57.5,
+        60.3,
         62.23
       ],
-      "volume_mm3": 31310.7
+      "volume_mm3": 31982.7
     }
   },
   "stance_deg": {

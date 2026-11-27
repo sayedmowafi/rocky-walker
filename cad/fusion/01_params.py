@@ -57,6 +57,7 @@ PARAMS = [
     ("bearing_w", "4 mm", "mm", "623ZZ width"),
     ("horn_d", "20 mm", "mm", "round aluminium 25T horn diameter"),
     ("horn_t", "2.5 mm", "mm", "horn plate thickness"),
+    ("horn_top_h", "8.45 mm", "mm", "aluminium horn disc top above the servo case top (47.0 base-to-disc-top measured - servo_h)"),
     ("horn_bolt_circle", "13.8 mm", "mm", "horn M3 bolt-circle diameter, centre to centre (from edge readings 11.3 across, 7.3 adjacent)"),
     ("horn_screw_clear", "3.6 mm", "mm", "horn screw hole in printed arms (PETG holes print ~0.2 mm small)"),
 ]
