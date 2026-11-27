@@ -84,8 +84,13 @@ def main():
     ap.add_argument("--bed", nargs=2, type=float, default=(180, 180))
     ap.add_argument("--height", type=float, default=180)
     ap.add_argument("--out", type=Path, required=True)
-    ap.add_argument("--down", action="append", default=[], metavar="PART=X,Y,Z",
-                    help="put this part's face with outward normal X,Y,Z on the plate")
+    ap.add_argument(
+        "--down",
+        action="append",
+        default=[],
+        metavar="PART=X,Y,Z",
+        help="put this part's face with outward normal X,Y,Z on the plate",
+    )
     ap.add_argument("stls", nargs="+", type=Path)
     a = ap.parse_args()
     downs = {k: [float(v) for v in xyz.split(",")] for k, xyz in (d.split("=") for d in a.down)}
@@ -94,8 +99,10 @@ def main():
     for p in a.stls:
         m, contact = best_orientation(trimesh.load_mesh(p), downs.get(p.stem))
         ext = m.extents
-        print(f"{p.stem:10s} footprint {ext[0]:6.1f} x {ext[1]:6.1f}  height {ext[2]:6.1f}  "
-              f"flat contact {contact:7.0f} mm2")
+        print(
+            f"{p.stem:10s} footprint {ext[0]:6.1f} x {ext[1]:6.1f}  height {ext[2]:6.1f}  "
+            f"flat contact {contact:7.0f} mm2"
+        )
         if ext[2] > a.height:
             raise SystemExit(f"{p.stem} is too tall for the printer")
         m.export(a.out / f"{p.stem}_print.stl")
@@ -117,17 +124,22 @@ def main():
     scene.export(a.out / "plate.3mf")
     try:
         import matplotlib
+
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
         from matplotlib.patches import Rectangle
+
         fig, ax = plt.subplots(figsize=(6, 6))
         ax.add_patch(Rectangle((0, 0), *a.bed, fill=False, lw=2))
         for name, geom in scene.geometry.items():
-            g = geom.copy(); g.apply_transform(scene.graph[name][0])
+            g = geom.copy()
+            g.apply_transform(scene.graph[name][0])
             ax.triplot(g.vertices[:, 0], g.vertices[:, 1], g.faces, lw=0.2, color="tab:blue")
             c = g.bounds.mean(0)
             ax.text(c[0], c[1], name, ha="center", va="center", fontsize=10, weight="bold")
-        ax.set_xlim(-5, a.bed[0] + 5); ax.set_ylim(-5, a.bed[1] + 5); ax.set_aspect("equal")
+        ax.set_xlim(-5, a.bed[0] + 5)
+        ax.set_ylim(-5, a.bed[1] + 5)
+        ax.set_aspect("equal")
         ax.set_title(f"Build plate {a.bed[0]:.0f} x {a.bed[1]:.0f} mm (top view)")
         fig.savefig(a.out / "plate.png", dpi=120, bbox_inches="tight")
     except ImportError:
