@@ -33,7 +33,7 @@ PARAMS = [
     ("servo_ear_l", "54 mm", "mm", "MG996R length across mounting ears (calipers + STEP)"),
     ("servo_ear_hole_pitch", "49.4 mm", "mm", "ear hole spacing along the length (STEP model)"),
     ("servo_ear_hole_gap", "10.5 mm", "mm", "ear hole spacing across the width (STEP model)"),
-    ("servo_ear_z", "30 mm", "mm", "ear underside height above the servo base (STEP model)"),
+    ("servo_ear_z", "28.4 mm", "mm", "ear underside above the servo base (real servo: ~31 to ear top - 2.5; bench mount check 52 - 3.3 - 47 + 30 = 28.3)"),
     ("servo_ear_t", "2.4 mm", "mm", "ear thickness (STEP model; calipers 2.5)"),
     ("servo_shaft_offset", "9.75 mm", "mm", "output shaft centre from the near end (STEP model)"),
     ("servo_shaft_h", "5.65 mm", "mm", "spline top above the case top (44.2 - 38.55, STEP model)"),

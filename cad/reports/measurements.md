@@ -25,7 +25,7 @@ Real measurements replace listing/datasheet sizes in the Fusion parameters.
 | Case height, base to top of case | 38.55 | **38.55** |
 | Base to top of spline | 44.2 | **44.2** (spline 5.65 above the case) |
 | Across ears | 54.0 | **54.0** |
-| Ear underside / top above base | 30.0 / 32.4 | **30.0** |
+| Ear underside / top above base | 30.0 / 32.4 | **28.4** (real servo, see below) |
 | Ear thickness | 2.4 | **2.4** |
 | Ear holes | Ø 4.4, pitch 49.4 along, 10.5 across | **Ø 4.4 (M4), 49.4 × 10.5** |
 | Shaft centre to nearest end | 9.75 | **9.75** |
@@ -47,3 +47,11 @@ diameter from both: (13.8 − 2.5 = 11.3, 9.76 − 2.5 = 7.26). The first CAD pa
 to centre. The printed parts then measured 8.1 / 4.9 edge to edge (11.3 / 8.0 centre to centre,
 3.2 mm holes), which matched the CAD but not the horn. Corrected 2026-11-27. Printed horn holes
 are now 3.6 mm (PETG prints ~0.2 mm small), and the centre clearance hole stays 6 mm.
+
+## Fit checks on printed parts (2026-11-27)
+
+| Check | Measured | CAD before | Fix |
+|---|---|---|---|
+| Servo base to top of the aluminium horn disc (horn fitted) | **47.0 mm** | 44.2 (disc assumed flush with the spline top) | `horn_top_h` = 8.45 above the case top |
+| Bench mount underside to horn disc top, servo hanging on its ears | **52 mm** | 50.3 | The servo hung 1.7 mm higher than modelled: its ears are lower on the body than the STEP model says. `servo_ear_z` 30.0 → **28.4** (agrees with the rough ≈ 31 to the ear top, minus 2.5 ear) |
+| M4 ear screw into a 3.4 mm pilot (PLA) | too tight to drive by hand | — | `m4_pilot` → 3.7 mm |

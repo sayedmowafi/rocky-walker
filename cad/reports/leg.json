@@ -81,7 +81,7 @@
     "servo_ear_hole_pitch": 49.4,
     "servo_ear_l": 54.0,
     "servo_ear_t": 2.4,
-    "servo_ear_z": 30.0,
+    "servo_ear_z": 28.4,
     "servo_h": 38.55,
     "servo_l": 40.3,
     "servo_lead_h": 4.6,
@@ -104,7 +104,7 @@
         35.57,
         64.4
       ],
-      "volume_mm3": 37571.8
+      "volume_mm3": 36402.2
     },
     "Femur": {
       "bbox_mm": [
@@ -112,7 +112,7 @@
         60.3,
         26.5
       ],
-      "volume_mm3": 37266.7
+      "volume_mm3": 36303.7
     },
     "FootCap": {
       "bbox_mm": [
