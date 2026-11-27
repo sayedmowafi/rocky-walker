@@ -51,12 +51,14 @@ PARAMS = [
     ("m4_nut_af", "7.2 mm", "mm", "M4 nut across flats (+clearance)"),
     ("m4_nut_t", "3.4 mm", "mm", "M4 nut thickness (+clearance)"),
     ("m4_pilot", "3.4 mm", "mm", "M4 self-tapping pilot hole in printed plastic"),
+    ("m3_pilot", "2.5 mm", "mm", "M3 self-tapping pilot hole in printed plastic (idler screws)"),
     ("bearing_od", "10 mm", "mm", "623ZZ outer diameter"),
     ("bearing_id", "3 mm", "mm", "623ZZ bore"),
     ("bearing_w", "4 mm", "mm", "623ZZ width"),
     ("horn_d", "20 mm", "mm", "round aluminium 25T horn diameter"),
     ("horn_t", "2.5 mm", "mm", "horn plate thickness"),
-    ("horn_bolt_circle", "11.3 mm", "mm", "horn M3 bolt-circle diameter (calipers, opposite holes centre to centre)"),
+    ("horn_bolt_circle", "13.8 mm", "mm", "horn M3 bolt-circle diameter, centre to centre (from edge readings 11.3 across, 7.3 adjacent)"),
+    ("horn_screw_clear", "3.6 mm", "mm", "horn screw hole in printed arms (PETG holes print ~0.2 mm small)"),
 ]
 
 

@@ -63,12 +63,14 @@
     "femur_min_deg": -40.0,
     "femur_mm": 70.0,
     "fit_clearance": 0.3,
-    "horn_bolt_circle": 11.3,
+    "horn_bolt_circle": 13.8,
     "horn_d": 20.0,
+    "horn_screw_clear": 3.6,
     "horn_t": 2.5,
     "m3_clear": 3.4,
     "m3_nut_af": 5.6,
     "m3_nut_t": 2.6,
+    "m3_pilot": 2.5,
     "m4_clear": 4.4,
     "m4_nut_af": 7.2,
     "m4_nut_t": 3.4,
@@ -98,18 +100,18 @@
     "Coxa": {
       "bbox_mm": [
         66.25,
-        35.57,
+        36.57,
         64.4
       ],
-      "volume_mm3": 27805.5
+      "volume_mm3": 27823.7
     },
     "Femur": {
       "bbox_mm": [
         101.6,
-        57.0,
+        57.5,
         26.5
       ],
-      "volume_mm3": 32377.9
+      "volume_mm3": 32485.9
     },
     "FootCap": {
       "bbox_mm": [
@@ -122,10 +124,10 @@
     "Tibia": {
       "bbox_mm": [
         112.73,
-        57.0,
+        57.5,
         62.23
       ],
-      "volume_mm3": 31228.7
+      "volume_mm3": 31310.7
     }
   },
   "stance_deg": {

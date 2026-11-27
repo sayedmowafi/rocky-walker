@@ -36,8 +36,14 @@ Servo ear screws change from M3 to **M4** (holes are Ø 4.4), with M4 captive-nu
 
 ## Aluminium 25T disc horn
 
-| Dimension | Measured | Was in CAD |
-|---|---|---|
-| Bolt circle (opposite holes, centre to centre) | **11.3 mm** | 14 mm |
+| Dimension | Caliper (tips in the holes = edge to edge) | Centre to centre | In CAD |
+|---|---|---|---|
+| Opposite holes | 11.3–11.4 mm | **13.8 mm** | bolt circle 13.8 |
+| Neighbouring holes | 7.3 mm | 9.8 mm | 9.76 |
+| Threaded hole size (solved) | — | ≈ 2.5 mm (M3 tap) | — |
 
-The printed parts' centre clearance hole shrank from 8 mm to 6 mm so it stays separate from the bolt holes.
+A square pattern gives neighbour = across / √2 centre to centre. Edge readings subtract one hole
+diameter from both: (13.8 − 2.5 = 11.3, 9.76 − 2.5 = 7.26). The first CAD pass took 11.3 as centre
+to centre. The printed parts then measured 8.1 / 4.9 edge to edge (11.3 / 8.0 centre to centre,
+3.2 mm holes), which matched the CAD but not the horn. Corrected 2026-11-27. Printed horn holes
+are now 3.6 mm (PETG prints ~0.2 mm small), and the centre clearance hole stays 6 mm.

@@ -39,9 +39,17 @@ def run(_context: str):
     M4, NAF4, NT4 = mm("m4_clear"), mm("m4_nut_af"), mm("m4_nut_t")  # servo ear screws
     BOD, BID, BW = mm("bearing_od"), mm("bearing_id"), mm("bearing_w")
     HD, HT, HBC = mm("horn_d"), mm("horn_t"), mm("horn_bolt_circle")
+    HSC = mm("horn_screw_clear")
+    M3P = mm("m3_pilot")
     ARM = 4.0  # driven arm plate thickness (horn side)
     IDL = 5.0  # idler arm thickness (bearing side, 1 mm floor behind the bearing)
     GAP = 0.5  # running gap between parts
+    # idler pivot: M3x8 screw, head in a recess in the idler arm clamping only the bearing inner
+    # ring against a boss on the cradle floor, threaded into that floor (no nut: the servo base
+    # sits right behind it). Boss height = idler gap, so arm and floor never rub.
+    IGAP = 1.0  # cradle floor to idler arm
+    BOSS_R = 3.0  # touches the inner ring only (623 outer ring bore is ~8 mm)
+    HEAD_R = 3.3  # M3 socket/button head (5.5-5.7 mm) clearance; leaves a 1.7 mm bearing lip
     HUB = 13.0  # hub radius around joint axes
 
     tbm = adsk.fusion.TemporaryBRepManager.get()
@@ -156,7 +164,8 @@ def run(_context: str):
         # open-topped slot in the shaft-end wall for the cable-exit block and its straight cable
         cut(c, box(-SO - LOUT - LSTIFF - 1, -SO + 0.01, -LW / 2 - C, LW / 2 + C,
                    -SH + LZ - LH / 2 - C, 10))
-        cut(c, cyl((0, 0, floor_z0 - 1), (0, 0, -SH + 1), M3 / 2))  # idler bolt
+        c = uni(c, cyl((0, 0, floor_z0 - IGAP), (0, 0, floor_z0 + 0.01), BOSS_R))  # idler boss
+        cut(c, cyl((0, 0, floor_z0 - IGAP - 1), (0, 0, -SH + 1), M3P / 2))  # idler screw pilot
         for hx, hy in ear_holes:
             cut(c, cyl((hx, hy, -SH + EZ - WALL - 1), (hx, hy, -SH + EZ + 1), M4 / 2))
             cut(c, hexprism((hx, hy, -SH + EZ - WALL - 0.01), "z", NAF4, NT4))
@@ -177,7 +186,7 @@ def run(_context: str):
                 off = (r * math.cos(a), r * math.sin(a), 0)
             p0 = tuple(center_axis_p0[i] + off[i] for i in range(3))
             p1 = tuple(p0[i] + ax[i] * length for i in range(3))
-            holes.append(cyl(p0, p1, M3 / 2))
+            holes.append(cyl(p0, p1, HSC / 2))
         p1 = tuple(center_axis_p0[i] + ax[i] * length for i in range(3))
         holes.append(cyl(center_axis_p0, p1, 3.0))  # centre-screw head clearance; must not merge with the bolt holes
         return holes
@@ -195,7 +204,7 @@ def run(_context: str):
     arm_y0 = y_top + SS  # horn-side arm inner face
     arm_y1 = arm_y0 + ARM
     floor_y = -SH / 2 - C - WALL  # cradle floor outer face (servo-side idler)
-    idl_y1 = floor_y - GAP
+    idl_y1 = floor_y - IGAP
     idl_y0 = idl_y1 - IDL
 
     # ---------- coxa bracket ----------
@@ -244,7 +253,7 @@ def run(_context: str):
             box(axis_x, axis_x + length, idl_y0, idl_y1, -half_w, half_w),
         )
         cut(idl_arm, cyl((axis_x, idl_y1 - BW, 0), (axis_x, idl_y1 + 1, 0), BOD / 2))
-        cut(idl_arm, cyl((axis_x, idl_y0 - 1, 0), (axis_x, idl_y1, 0), BID / 2 + 0.6))
+        cut(idl_arm, cyl((axis_x, idl_y0 - 1, 0), (axis_x, idl_y1, 0), HEAD_R))  # screw head recess
         return horn_arm, idl_arm
 
     kc = cradle(*knee_servo_frame)
