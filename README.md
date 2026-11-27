@@ -6,13 +6,13 @@ Rocky Walker has five legs spread evenly around a round, rock-like carapace, and
 
 ## Status
 
-**M2 done: Rocky has a real, printable design (Fusion 360) and walks and dances in Blender, driven by the real motion code.** See [build log #2](docs/build-log/2026-11-23-02-fusion-and-blender.md).
+**Parts are in and the first hip is printed.** Every servo has been bench-tested, the CAD is corrected to caliper measurements, the leg prints without supports, and the body is now wide and flat, all in black. See [build log #3](docs/build-log/2026-11-27-03-real-parts-and-wide-body.md).
 
-![Render of Rocky in Blender (not a photo)](docs/build-log/media/02-hero.png)
+![Render of the wide-body Rocky in Blender (not a photo)](docs/build-log/media/03-hero.png)
 
 *Render, not a photo: see the preview section below.*
 
-Next up is the **bench leg**: one printed leg on real servos. Follow along in the [build log](docs/build-log/).
+Next up is finishing the **bench leg**: one printed leg on real servos. Follow along in the [build log](docs/build-log/).
 
 | Milestone | What | State |
 |---|---|---|
@@ -32,11 +32,17 @@ Next up is the **bench leg**: one printed leg on real servos. Follow along in th
 
 | Walk forward | Walk diagonally (no front!) |
 |---|---|
-| ![Render: Rocky walking forward](docs/build-log/media/02-walk-forward.gif) | ![Render: Rocky walking diagonally](docs/build-log/media/02-walk-diagonal.gif) |
+| ![Render: Rocky walking forward](docs/build-log/media/03-walk-forward.gif) | ![Render: Rocky walking diagonally](docs/build-log/media/03-walk-diagonal.gif) |
 | **Turn in place** | **Dance routine** |
-| ![Render: Rocky turning in place](docs/build-log/media/02-turn.gif) | ![Render: Rocky dancing](docs/build-log/media/02-dance.gif) |
+| ![Render: Rocky turning in place](docs/build-log/media/03-turn.gif) | ![Render: Rocky dancing](docs/build-log/media/03-dance.gif) |
 
-Full-length render videos (MP4) are on the [M2 release](https://github.com/sayedmowafi/rocky-walker/releases/tag/m2).
+| Ring ripple | Star step |
+|---|---|
+| ![Render: Rocky's legs lifting in turn around the ring](docs/build-log/media/03-ring-ripple.gif) | ![Render: Rocky stepping in pentagram order](docs/build-log/media/03-star-step.gif) |
+| **Rock mode** | **Rest mode** (before power-off or charging) |
+| ![Render: Rocky flattening into a rock](docs/build-log/media/03-rock-mode.gif) | ![Render: Rocky sitting down to rest](docs/build-log/media/03-rest-mode.gif) |
+
+Full-length render videos of the earlier, stacked design are on the [M2 release](https://github.com/sayedmowafi/rocky-walker/releases/tag/m2).
 
 ## Why
 
@@ -79,7 +85,7 @@ uv run mjpython -m rocky.sim walk --vx 0.03 --viewer       # interactive 3D view
 
 Everything for printing is in [`cad/`](cad/):
 
-- `cad/stl/`: one STL per printed part (Coxa, Femur, Tibia ×5; ChassisTop, ChassisBottom, BatteryTray, Deck, Carapace ×1). They're exported in assembly orientation, so use your slicer's "lay on face" to put each part flat. PLA, 0.2 mm layers, at least 4 walls, 30–40% infill. Every part fits a 180 mm bed.
+- `cad/stl/`: one STL per printed part. Leg (×5): Coxa, Femur, Tibia, FootCap (TPU). Body (×1 each): ChassisTub_1–5, ChassisTop, BatteryHatch, Carapace_1–5, CarapaceRing, CarapaceCap, RockFace_1–5. All black. They're exported in assembly orientation, so use your slicer's "lay on face" to put each part flat. Every part fits a 180 mm bed.
 - `cad/stl/plates/print1-hip/plate.3mf`: **print this first**: hip bracket + bench mount, support-free (see `docs/assembly/test-leg.md`).
 - `cad/rocky.f3d` is the editable Fusion 360 source; `cad/rocky.step` opens in any CAD tool.
 - Parts list: [docs/bom.md](docs/bom.md).
