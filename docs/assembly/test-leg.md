@@ -67,8 +67,11 @@ longer screw goes through the horn and hits the servo case.
 6. **Pivot screw:** one M3 × 8 up from below, through the head recess, the bearing and the washers,
    into the hole in the mount's floor. Tighten until the head grips the bearing's inner ring, then
    stop. Swing the coxa by hand: it should turn freely, with the arm not touching the floor.
-7. **Clamp the tail** to the desk with a C-clamp, or two wood screws through its holes. Put the
+7. **Clamp the tail** to the desk: a C-clamp on the tail's top plate, or two wood screws through
+   its holes into a board. The tail is a box open underneath, standing on its walls. Put the
    tail's front face (the end nearest the servo) on the desk edge, so the leg hangs over the edge.
+   The mount's pocket floor is mostly open: the servo hangs on its ears, and the beam across the
+   middle takes the pivot screw.
 
 ## 2. Femur (print 2)
 

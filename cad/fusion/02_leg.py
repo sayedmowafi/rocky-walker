@@ -315,18 +315,24 @@ def run(_context: str):
     mount = cradle(*coxa_servo_frame)
     m_floor = coxa_top - SH - C - WALL
     m_rim = coxa_top - SH + EZ  # top of the pocket walls / ear blocks
-    # the tail is an open-topped box up to the rim, so the mount prints upside down (rim on the
-    # plate) with only short bridges: pocket floor and tail plate span ~20 mm between walls
+    # the tail is a box open underneath with its plate at the rim, so the mount prints upside
+    # down (rim and tail plate on the build plate) with no bridge in the tail; its walls stand on
+    # the desk and a clamp presses the plate down
     pocket_back = -(ear_cx + EL / 2 + 2)  # leg x of the pocket's back ear block
     tail = box(TAIL_X0, pocket_back + 0.01, -SW / 2 - o, SW / 2 + o, m_floor - TAIL_T, m_rim)
     cut(tail, box(TAIL_X0 + WALL, pocket_back, -SW / 2 - o + WALL, SW / 2 + o - WALL,
-                  m_floor - TAIL_T + 5.0, m_rim + 1))  # 5 mm clamp plate, 3 mm walls
+                  m_floor - TAIL_T - 1, m_rim - 5.0))  # 5 mm clamp plate on top, 3 mm walls
     # under the pocket's back end only a plate (the servo sits above it); stops short of the
     # leg's sweep
     tail = uni(tail, box(pocket_back, TAIL_X1, -SW / 2 - o, SW / 2 + o, m_floor - TAIL_T, m_floor + 0.01))
     mount = uni(mount, tail)
-    for hx in (-50.0, -80.0):  # clamp / wood-screw holes through the tail
-        cut(mount, cyl((hx, 0, m_floor - TAIL_T - 1), (hx, 0, m_floor + 50), 2.25))
+    # open the pocket floor except an 8 mm beam across the shaft axis for the pivot screw: the
+    # servo hangs on its ears, and upside down the floor would be one 40 x 20 mm bridge
+    fl0, fl1 = m_floor - 1, m_floor + WALL + 0.01
+    for xa, xb in ((-SO - C, -4.0), (4.0, SL - SO + C)):  # servo-local x; leg x = -local x
+        cut(mount, box(-xb, -xa, -SW / 2 - C, SW / 2 + C, fl0, fl1))
+    for hx in (-50.0, -80.0):  # wood-screw holes through the tail plate
+        cut(mount, cyl((hx, 0, m_rim - 6), (hx, 0, m_rim + 1), 2.25))
 
     # ---------- write into Fusion ----------
     leg_occ = next(o for o in root.occurrences if o.component.name == "Leg")
