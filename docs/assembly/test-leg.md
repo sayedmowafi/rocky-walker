@@ -48,6 +48,8 @@ longer screw goes through the horn and hits the servo case.
 
 ## 1. Hip bracket + bench mount (print 1)
 
+Step-by-step with pictures: [print1-hip.md](print1-hip.md).
+
 ![Hip bracket, exploded](media/01-hip-bracket.png)
 
 1. **Hip-yaw servo (3) into the bench mount,** spline up and on the end away from the tail.
