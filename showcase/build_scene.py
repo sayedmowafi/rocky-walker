@@ -27,11 +27,11 @@ from mathutils import Matrix, Vector
 COLORS = {
     "blue": (0.06, 0.20, 0.62, 1.0),
     "white": (0.85, 0.85, 0.82, 1.0),
-    "black": (0.025, 0.025, 0.03, 1.0),
+    "black": (0.012, 0.012, 0.014, 1.0),  # black PLA/PETG
     "grey": (0.22, 0.22, 0.24, 1.0),
     "silver": (0.6, 0.6, 0.62, 1.0),
 }
-ROUGHNESS = {"blue": 0.45, "white": 0.6, "black": 0.5, "grey": 0.55, "silver": 0.3}
+ROUGHNESS = {"blue": 0.45, "white": 0.6, "black": 0.38, "grey": 0.55, "silver": 0.3}
 
 
 def parse_args():
@@ -191,8 +191,8 @@ def stage(torso, args):
     bsdf = nodes.get("Principled BSDF")
     checker = nodes.new("ShaderNodeTexChecker")
     checker.inputs["Scale"].default_value = 100.0  # 10 cm squares on a 20 m plane
-    checker.inputs["Color1"].default_value = (0.55, 0.56, 0.58, 1)
-    checker.inputs["Color2"].default_value = (0.47, 0.48, 0.5, 1)
+    checker.inputs["Color1"].default_value = (0.72, 0.73, 0.75, 1)
+    checker.inputs["Color2"].default_value = (0.64, 0.65, 0.67, 1)
     links.new(checker.outputs["Color"], bsdf.inputs["Base Color"])
     bsdf.inputs["Roughness"].default_value = 0.8
     floor.data.materials.append(mat)
@@ -211,6 +211,14 @@ def stage(torso, args):
     fill_o.location = (-1.0, 1.2, 1.2)
     fill_o.rotation_euler = (math.radians(-50), math.radians(-30), 0)
     scene.collection.objects.link(fill_o)
+    # rim light from behind and above: outlines the black parts against the floor
+    rim = bpy.data.lights.new("rim", "AREA")
+    rim.energy = 140
+    rim.size = 1.5
+    rim_o = bpy.data.objects.new("rim", rim)
+    rim_o.location = (-0.8, 1.4, 0.9)
+    rim_o.rotation_euler = (math.radians(-60), 0, math.radians(200))
+    scene.collection.objects.link(rim_o)
     scene.world = scene.world or bpy.data.worlds.new("world")
     scene.world.use_nodes = True
     bg = scene.world.node_tree.nodes.get("Background")
